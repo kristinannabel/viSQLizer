@@ -1,0 +1,31 @@
+.menu {
+	background-color: rgb(250, 250, 250);
+	min-height: 600px;
+	margin-top: -20px;
+	border-left: 1px solid #eee;
+	border-bottom: 1px solid #eee;
+}
+.menu-content {
+	margin-right: 12px;
+	margin-top: 12px;
+}
+
+.databaseTables tr {
+	cursor: pointer;
+}
+
+.tableColumns {
+	margin-left: 6px;
+	margin-top: 8px;
+}
+
+.alert-info-decomposer {
+	color: black;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+
+.page-header a:hover {
+	color: #428bca;
+	text-decoration: none;
+}
