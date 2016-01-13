@@ -20,11 +20,11 @@
 			include_once('parser.php');
 			
 			$sql = $_POST["sql-input"];
-			/*
+			
 			ini_set('display_errors',1);
 			ini_set('display_startup_errors',1);
 			error_reporting(-1);
-			*/
+			
 			?>  
 					
     </head>
@@ -58,7 +58,7 @@
 			
 				<?php
 					
-					$con=mysqli_connect(DB_SERVER,TU_USER,TU_PASSWORD,DB_DATABASE);
+					$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 					if (mysqli_connect_errno()) {	?>
 						<div class="alert alert-danger" role="alert"> Failed to connect to MySQL:" <?php echo mysqli_connect_error();?> </div>	<?php	
 					}
@@ -69,24 +69,26 @@
 						$result = mysqli_query($con, $sql);
 						$error = mysqli_error($con);
 						
+						
+						if(!isset($_COOKIE["pagemode"])) {
+							$pagemode = "Single";
+						} else {
+							$pagemode = $_COOKIE["pagemode"];
+						}
+						
 						if($result) 
 						{
-							
 							$parser = new Parser($sql, $con);
-							if(!isset($_COOKIE["pagemode"])) {
-								$pagemode = "Single";
-							} else {
-								$pagemode = $_COOKIE["pagemode"];
-							}
 							//Sjekk om cookien er singlestep eller stream
 							if($pagemode == "Single") {
 								$parser->setMode('single');
 								$parser->parse_sql_query();
-								
+							
 							} else {
 								$parser->setMode('stream');
 								$parser->parse_sql_query();
 							}
+							
 							?>
 							<br>
 							<?php
@@ -166,8 +168,8 @@
 				<div class="panel panel-info">
 				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-star"></span> Saved queries</h3></div>
 					<?php
-						$tucon = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,TU_DATABASE);
-						$favorites = "SELECT query FROM saved_queries WHERE username = '" . TU_USER. "'";
+						$tucon = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,ADMIN_DATABASE);
+						$favorites = "SELECT query FROM saved_queries WHERE username = '" . DECOMPOSE_USER. "'";
 						
 						$favoritesresult = mysqli_query($tucon,$favorites);
 						

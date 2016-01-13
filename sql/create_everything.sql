@@ -1,8 +1,8 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-CREATE DATABASE IF NOT EXISTS `favorites` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `favorites`;
+CREATE DATABASE IF NOT EXISTS `visqlizer_storage` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `visqlizer_storage`;
 
 DROP TABLE IF EXISTS `saved_queries`;
 CREATE TABLE IF NOT EXISTS `saved_queries` (
@@ -23,8 +23,8 @@ ALTER TABLE `saved_queries`
 ALTER TABLE `saved_queries`
 MODIFY `id` int(20) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=40;
 
-CREATE DATABASE IF NOT EXISTS `testbase` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `testbase`;
+CREATE DATABASE IF NOT EXISTS `visqlizer` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `visqlizer`;
 
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (

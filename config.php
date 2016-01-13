@@ -9,15 +9,15 @@
 	define('DB_SERVER',"localhost");
 	
 	// Database for stored queries, users etc.
-	define('ADMIN_DATABASE', "favorites");
+	define('ADMIN_DATABASE', "visqlizer_storage");
 	
 	//User and database for decomposing (test-tables). User has only SELECT-privileges.
-	define('DECOMPOSE_DATABASE',"testbase");
+	define('DECOMPOSE_DATABASE',"visqlizer");
 	define('DECOMPOSE_PASSWORD', "testuser");
 	define('DECOMPOSE_USER', "testuser");
 		
 	// Define your root (if in the actual www-root; keep it empty)
 	// If in www-root/SQLD, write "/SQLD"
-	define('ROOT',"");
+	define('ROOT',"/viSQLizer");
 	
 ?>
