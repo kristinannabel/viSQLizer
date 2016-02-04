@@ -67,11 +67,11 @@ class tbl{
 			</tr>
 			<?php
 				// Table data:
-				for($m=0; $m < count($finalTbResult); $m++){ ?>
-					<tr>
-						<?php 				
+				for($m=0; $m < count($finalTbResult); $m++){ 
+					echo '<tr id="original-td_'.$m.'">';
+									
 							for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-								echo '<td><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+								echo '<td class="original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 							}?>
 					</tr>
 					<?php
@@ -106,11 +106,12 @@ class tbl{
 					</tr>
 					<?php
 						// Table data:
-						for($m=0; $m < count($finalTbResult); $m++){ ?>
-							<tr>
-								<?php 				
+						for($m=0; $m < count($finalTbResult); $m++){ 
+							echo '<tr id="original-td_'.$m.'">';
+												
 									for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-										echo '<td><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+										echo '<td class="original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span>
+											<span id="original-span" class="original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 									}?>
 							</tr>
 							<?php

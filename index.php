@@ -52,29 +52,39 @@
 		  			formDOMElement.y = canvas.height * -0.50; //- 200;
 	
 		        	stage.addChild(formDOMElement);
-		        	//stage.update();
+		        	stage.update();
 		  	  		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		  			for(var i = 0; i < thCount; i++){
 		  				var spanName = ".span_" + i;
 		  				$(".empty-table").find(spanName).css("visibility","hidden");
 		  			}
 					
+					
+					
 					var textDOM = new createjs.DOMElement("span_0");
 					stage.addChild(textDOM);
 		  		  	createjs.Tween.get(textDOM, {loop: false})
-					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+					.wait(1500)
+					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
+					$("#original-td_0").find(".original-span_0").show();
 					
 					var textDOM1 = new createjs.DOMElement("span_1");
 					stage.addChild(textDOM1);
 		  		  	createjs.Tween.get(textDOM1, {loop: false})
-					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+					.wait(1500)
+					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
+					$("#original-td_0").find(".original-span_1").show();
 					
 					var textDOM2 = new createjs.DOMElement("span_2");
 					stage.addChild(textDOM2);
 		  		  	createjs.Tween.get(textDOM2, {loop: false})
-					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+					.wait(1500)
+					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
+					$("#original-td_0").find(".original-span_2").show();
+					
 		          	  //.to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
-		           	  //.to({alpha: 0, y: 125}, 100)
+		           	  //.to({alpha: 0, y: 216}, 100)
+					//.to({alpha: 1, y: 0}, 100);
 		          	  //.to({alpha: 1, y: 100}, 500, createjs.Ease.getPowInOut(2))
 		           	  //.to({x: 100}, 800, createjs.Ease.getPowInOut(2));
 		         	createjs.Ticker.setFPS(60);

@@ -32,3 +32,6 @@
 #main-panel#streammode-panel {
 	margin-bottom: 0px !important;
 }
+#original-span {
+	display: none;
+}
