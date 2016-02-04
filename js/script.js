@@ -1,8 +1,91 @@
-$(document).ready(function(){	
+$(document).ready(function(){
+	/*$lastImageH = 0;
+	$lastImageW = 0;
+	$totalImageH = 0;
+	var picObjArr = [];
+	var renderer;
+	var stage;
+	
+	
+	$('.decompose').click(function(e){
+		debugger;
+		var canvas = $("#canvas");
+		renderer = PIXI.autoDetectRenderer(600,600, canvas);
+		renderer.backgroundColor = 0xffffff;
+		document.body.appendChild(renderer.view);
+		stage = new PIXI.Container();
+		addImage('/viSQLizer/Course/code.png', 'code', false, true);
+		addImage('/viSQLizer/Course/name.png', 'name', false, false);
+		draw();
+	});
+	//setSizeOfCanvas(picObjArr);
+	
+	function setSizeOfCanvas($array){
+		debugger;
+		var finalWidth = 0;
+		var finalHeight = 0;
+		var thisObjH = 0;
+		var prevObjH = 0;
+		for(var i = 0; i < $array.length; i++){
+			debugger;
+			finalWidth += $array[i].width;
+			thisObjH = $array[i].height;
+			if(thisObjH >= prevObjH){
+				finalHeight = thisObjH;
+			}
+			prevObjH = thisObjH;
+		}
+	}
+	
+	function setPositionOfElement($elem,$posx,$posy){
+		$elem.position.x = $posx;
+		$elem.position.y = $posy;
+	}
+	
+	function addImage($url, $name, $newRow, $isFirst){
+		var texture = PIXI.Texture.fromImage($url);
+		var img = new PIXI.Sprite(texture);
+		picObjArr.push(img);
+		if(!$isFirst && !$newRow){//not first elem and not new row
+			var posx = $lastImageW + 2;
+			//var posy = $lastImageH + 2;
+			setPositionOfElement(img, posx, 0);
+		}
+		else if($isFirst && $newRow){//first elem of new row
+			$totalImageH += $lastImageH;
+			//var posx = $lastImageW + 2;
+			var posy = $totalImageH + 2;
+			setPositionOfElement(img, 0, posy);
+		}
+		else if(!$isFirst && $newRow){//not first but new row
+			var posx = $lastImageW + 2;
+			var posy = $totalImageH + 2;
+			setPositionOfElement(img, posx, posy);
+			
+		}
+		stage.addChild(img);
+		var thisImg = $($name);
+		
+		$lastImageW = thisImg.width() + 2;
+		$lastImageH = thisImg.height() + 2;
+	}
+	
+	function draw() {
+	  renderer.render(stage);
+	  requestAnimationFrame(draw);
+	}*/
+	//draw();
+	//renderer.render(stage);
+	/*var sprite = PIXI.Sprite.fromImage("/viSQLizer/Course/code.png");
+	var graphics = new PIXI.Graphics();
+	stage.addChild(graphics);
+	graphics.addChild(sprite);
+	renderer.render(stage);*
+	
 	/** Operations for stream mode **/
 	
 	
-	$('input[name="pagemode"]:checked').prop("disabled", true);
+	//$('input[name="pagemode"]:checked').prop("disabled", true);
 	
 	function setActiveStep(anum){
 		var thisStep = ".step" + anum;
@@ -36,7 +119,7 @@ $(document).ready(function(){
 		var anum = stepnum;
 		
 		var query = $('#sql-query-input').val();
-		$.post("/", {stepnumber: stepnum, "sql-input": query}, function response(data){
+		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
 			setActiveStep(anum);
 		});
@@ -53,7 +136,7 @@ $(document).ready(function(){
 		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
 			var query = $('#sql-query-input').val();
-			$.post("/", {stepnumber: num, "sql-input": query}, function response(data){
+			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
 				setActiveStep(anum);
 			});
@@ -74,7 +157,7 @@ $(document).ready(function(){
 		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
 			var query = $('#sql-query-input').val();
-			$.post("/", {stepnumber: num, "sql-input": query}, function response(data){
+			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
 				setActiveStep(anum);
 			});
@@ -85,64 +168,8 @@ $(document).ready(function(){
 		
 	});	
 
-	/** Cookie operations **/
-	function getCookie(cname) {
-		var name = cname + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0; i<ca.length; i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1);
-			if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
-		}
-		return "";
-	}
-
-	var pagemode = getCookie("pagemode");
-	if (pagemode != "") {
-		if(pagemode == "Single"){
-			$('input[name="pagemode"][value="Single"]').prop('checked', true);
-			$('input[name="pagemode"][value="Stream"]').prop('checked', false);
-		}
-		else {
-			$('input[name="pagemode"][value="Stream"]').prop('checked', true);
-			$('input[name="pagemode"][value="Single"]').prop('checked', false);
-		
-			$(".wizard-footer").find(".step1").addClass("active");
-			$(".wizard-footer").find(".previous").addClass("disabled");		
-		}
-	}
-	else{
-		// Hent checked checkbox og lag cookie
-		var d = new Date();
-		d.setTime(d.getTime() + (30*24*60*60*1000));
-		var expires = "expires="+d.toUTCString();
-		document.cookie="pagemode=Single; " + expires;
-		$('input[name="pagemode"][value="Single"]').prop('checked', true);
-	}
-
-	//When checkbox is clicked
-	$('input[name="pagemode"]').on('change', function() {
-		$('input[name="pagemode"]').not(this).prop('checked', false);
-		$('input[name="pagemode"]').not(this).attr('disabled', false);
-		$(this).attr('disabled', true);
-		
-		var d = new Date();
-		d.setTime(d.getTime() + (30*24*60*60*1000));
-		var expires = "expires="+d.toUTCString();
-		
-		if(this.defaultValue == 'Single'){
-			document.cookie="pagemode=Single; " + expires;
-			//vis partial view single
-		}
-		else {
-			document.cookie="pagemode=Stream; " + expires;
-			// vis partial view stream
-		}
-		if($('#sql-query-input').val().length >0){
-			$('.decompose').click();
-		}
-		
-	});
+	$(".wizard-footer").find(".step1").addClass("active");
+	$(".wizard-footer").find(".previous").addClass("disabled");
 
 	/**Operations for saving/deleting/running queries**/
 	// when save-button is clicked

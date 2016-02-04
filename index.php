@@ -10,27 +10,59 @@
 			<link href="css/starter-template.css" rel="stylesheet">
 			<link href="css/stylesheet.css" rel="stylesheet">
 			
-			<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-			<script src="js/bootstrap.min.js"></script>
+			<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+			<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+			<script type="text/javascript" src="js/bootstrap.min.js"></script>
+			<script src="pixi/bin/pixi.js"></script>
 			<script type="text/javascript" src="js/script.js"></script>
+			<script src="livequery/jquery.livequery.js"></script>
+			<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+			
 			
             <?php 
 			include_once('config.php');
 			include_once('tbl.php');
 			include_once('parser.php');
-			
-			$sql = $_POST["sql-input"];
+			if($_POST){
+				$sql = $_POST["sql-input"];
+			}
 			
 			ini_set('display_errors',1);
 			ini_set('display_startup_errors',1);
 			error_reporting(-1);
 			
 			?>  
-					
+				
+		<script>      
+		      function init() {
+		        var stage = new createjs.Stage("demoCanvas");
+				var canvas = document.getElementById("demoCanvas");
+				var table = document.getElementById("main-panel streammode-panel");
+				var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
+				
+				stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
+				stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
+				
+				//move it's rotation center at the center of the form
+				formDOMElement.regX = table.offsetWidth*0.5;
+				formDOMElement.regY = table.offsetHeight*0.6;
+				//move the form above the screen
+				formDOMElement.x = canvas.width * 0.5;
+				formDOMElement.y =  - 200;
+				
+		        stage.addChild(formDOMElement);
+		        stage.update();
+				var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
+				for(var i = 0; i < thCount; i++){
+					var spanName = ".span_" + i;
+					$(spanName).css("visibility","hidden");
+				}
+		      }
+		</script>
     </head>
-    <body>
+    <body onload="init();">
         <div class="page-header">
-            <h1><a href="/"> SQL Decomposer</a> <small>  by MACS-students </small> </h1>
+            <h1><a href="/"> viSQLizer</a> <small>  SQL learning tool </small> </h1>
         </div>
 		
 		<div class="col-md-9 content">
@@ -48,7 +80,7 @@
 				<form method="post" action="">
 					<div class="input-group">
 						<input type="text" id="sql-query-input" class="form-control" placeholder="Enter a SQL query.."
-							<?php if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
+							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
 							<span class="input-group-btn">
 								<button class="btn btn-default decompose" type="submit">Decompose</button>
 								<button class="btn btn-default" id="save_button"><span class="glyphicon glyphicon-floppy-disk"></span></button>
@@ -60,34 +92,24 @@
 					
 					$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 					if (mysqli_connect_errno()) {	?>
-						<div class="alert alert-danger" role="alert"> Failed to connect to MySQL:" <?php echo mysqli_connect_error();?> </div>	<?php	
-					}
-					
+						<div class="alert alert-danger" role="alert"> Failed to connect to MySQL:" <?php echo mysqli_connect_error();?> </div>	
+						
+						
+						<?php	
+					}?>
+					<canvas id="demoCanvas" width="500" height="300"></canvas>
+					<?php
 					if (isset($sql) && $sql != "")
 					{
 						// Check if the SQL contains any errors:
 						$result = mysqli_query($con, $sql);
 						$error = mysqli_error($con);
 						
-						
-						if(!isset($_COOKIE["pagemode"])) {
-							$pagemode = "Single";
-						} else {
-							$pagemode = $_COOKIE["pagemode"];
-						}
-						
 						if($result) 
 						{
 							$parser = new Parser($sql, $con);
-							//Sjekk om cookien er singlestep eller stream
-							if($pagemode == "Single") {
-								$parser->setMode('single');
-								$parser->parse_sql_query();
-							
-							} else {
-								$parser->setMode('stream');
-								$parser->parse_sql_query();
-							}
+							$parser->setMode('stream');
+							$parser->parse_sql_query();
 							
 							?>
 							<br>
@@ -119,36 +141,6 @@
 		</div> <!-- class="col-md-9 -->
 		<div class="col-md-3 menu">
 			<div class="menu-content">
-				<div class="panel panel-info">
-				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-cog"></span> Decomposer mode</h3></div>
-				  <div class="panel-body">
-					<div class="checkbox">
-						<label>
-							<?php 
-								if($_COOKIE["pagemode"] == "Single"){
-									echo "<input type='checkbox' name='pagemode' value='Single' checked> Single-step mode";
-								}
-								else{
-									echo "<input type='checkbox' name='pagemode' value='Single'> Single-step mode";
-								}
-							?>
-						</label>
-					</div>
-					<div class="checkbox">
-						<label>
-							<?php 
-								if($_COOKIE["pagemode"] == "Stream"){
-									echo "<input type='checkbox' name='pagemode' value='Stream' checked> Stream mode";
-								}
-								else{
-									echo "<input type='checkbox' name='pagemode' value='Stream'> Stream mode";
-								}
-							?>
-						</label>
-					</div>
-				  </div>
-				</div>
-				
 				<div class="panel panel-info">
 				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> Database tables</h3></div>
 					<?php
@@ -184,5 +176,23 @@
 				</div>
 			</div>
 		</div>
+		<div class="imageContainer" style="visibility:hidden;">
+			<div class="Course">
+				<img class="code" src="/viSQLizer/Course/code.png">
+				<img src="/viSQLizer/Course/name.png">
+				<img src="/viSQLizer/Course/data_code.png">
+				<img src="/viSQLizer/Course/data_name.png">
+				<img src="/viSQLizer/Course/data_code_2.png">
+				<img src="/viSQLizer/Course/data_name_2.png">
+			</div>
+			<div class="Exam">
+			</div>
+			<div class="Student">
+			</div>
+		</div>
+		<!--<canvas id="canvas" class="hide" width="300" height="300"></canvas>-->
     </body>
+		<script>
+	
+		</script>
 </html>

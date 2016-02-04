@@ -4992,6 +4992,9 @@ a.list-group-item-danger.active:focus {
   margin-bottom: 0;
   line-height: 1.3;
 }
+.streammode-panel {
+	margin-bottom: 0px !important;
+}
 .panel {
   margin-bottom: 20px;
   background-color: #fff;

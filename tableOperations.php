@@ -14,7 +14,7 @@
 		// escape variables for security
 		$tablename = (string)$_POST['action'];
 
-		$sql = "SELECT column_name FROM COLUMNS WHERE TABLE_NAME='".$tablename."'  AND TABLE_SCHEMA = '".DB_DATABASE."'";
+		$sql = "SELECT column_name FROM COLUMNS WHERE TABLE_NAME='".$tablename."'  AND TABLE_SCHEMA = '".DECOMPOSE_DATABASE."'";
 
 		$result = mysqli_query($con,$sql);
 		

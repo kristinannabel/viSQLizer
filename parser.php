@@ -2,6 +2,7 @@
 	require_once dirname(__FILE__) . '/parser/PHPSQLParser.php';
 	require_once dirname(__FILE__) . '/parser/PHPSQLCreator.php';
 	include('array_functions.php');
+	//include('config.php');
 	
 	class Parser {
 		private $db_connection;
@@ -11,6 +12,7 @@
 		private $singleStepTable;
 		private $currentStep;
 		private $totalSteps;
+		private $tableNames;
 
 
 		public function __construct($sql, $database_connection) {
@@ -23,10 +25,14 @@
 			$this->currentStep=1;
 			$this->mode='single';
 			$this->totalSteps=0;
+			$this->tableNames = array();
 		}
 		
 		public function parse_sql_query($step=0) {
-						
+			$tableCount = count($this->parser->parsed['FROM']);
+			for($i = 0; $i < $tableCount; $i++){
+				$this->tableNames[$i] = $this->parser->parsed['FROM'][$i]['table'];
+			}			
 			// Set the first select to select all collumns. The projection step should be the last step.
 			$select['SELECT']=array("0"=>array("expr_type"=>"colref", "alias"=>"", "base_expr"=>"*", "no_quotes"=>"", "sub_tree"=>"", "delim"=>"", "position"=>"7"));
 						
@@ -190,6 +196,9 @@
 			return $this->totalSteps;
 		
 		}
+		public function getListOfTables() {
+			return $this->tableNames;
+		}
 		//Displays text or tables during stream mode or put them into an array for step-mode
 		private function makeTable($result,$boole) {
 			$this->addTableEntry('table',$result);
@@ -249,14 +258,7 @@
 		}
 		public function displayResult($step=0) {
 			$this->compareQueries();
-			if ($this->mode=='single') {
-				for ($i=1; $i<=count($this->singleStepTable);$i++) {
-					$this->showStep($i);
-				}
-			}
-			else {
-				$this->showStep2($step);
-			}
+			$this->showStep2($step);
 		}
 		//Takes the chosen step after the parser has run and displays the text and tables for the step
 		public function showStep($step) {
@@ -276,8 +278,14 @@
 		}
 		// Displays the text and tabled for the step inside a wizard
 		public function showStep2($step) {
+			$tableName[] = $this->getListOfTables();
+			$query = "SELECT * FROM " . $tableName[0][0];
+			$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+			$tableResult = mysqli_query($con, $query);
+			//print_r($tableResult);
+			
 			$numOfSteps = $this->getTotalSteps();
-			echo "<div class='panel panel-default streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
+			echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 			echo "<div class='panel-body'>";
 			foreach($this->singleStepTable[$step] as $output) {
 				if (($output['type']=='text') or ($output['type']=='query')){
@@ -288,7 +296,7 @@
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true);
+					$TBL->make_table($output['contents'], true, "dbtable", true, $tableResult);
 				}
 			}
 			echo "</div>";

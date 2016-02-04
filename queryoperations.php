@@ -5,7 +5,7 @@ if(function_exists($_GET['f'])) {
 	$_GET['f'](); 
 }
 function save_query(){
-	$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,TU_DATABASE);
+	$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,ADMIN_DATABASE);
 	// Check connection
 	if (mysqli_connect_errno()) {
 	  echo "Failed to connect to MySQL: " . mysqli_connect_error();
@@ -14,14 +14,14 @@ function save_query(){
 	// escape variables for security
 	$sqlquery = (string)$_POST['action'];
 
-	$check = "SELECT * FROM saved_queries WHERE username = '".TU_USER."' AND query = '".$sqlquery."'";
+	$check = "SELECT * FROM saved_queries WHERE username = '".DECOMPOSE_USER."' AND query = '".$sqlquery."'";
 	$checkresult = mysqli_query($con,$check);
 	if($checkresult->num_rows > 0){
 		echo "excist";
 	}
 	else {
 	$sql = "INSERT INTO saved_queries (username, query) 
-	VALUES ('".TU_USER."','".$sqlquery."')";
+	VALUES ('".DECOMPOSE_USER."','".$sqlquery."')";
 
 	if (!mysqli_query($con,$sql)) {
 	  die('Error: ' . mysqli_error($con));
@@ -31,7 +31,7 @@ function save_query(){
 	mysqli_close($con);
 }
 function delete_query(){
-	$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,TU_DATABASE);
+	$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASSWORD,ADMIN_DATABASE);
 	// Check connection
 	if (mysqli_connect_errno()) {
 	  echo "Failed to connect to MySQL: " . mysqli_connect_error();
@@ -40,11 +40,11 @@ function delete_query(){
 	// escape variables for security
 	$sqlquery = (string)$_POST['action'];
 
-	$check = "SELECT * FROM saved_queries WHERE username = '".TU_USER."' AND query = '".$sqlquery."'";
+	$check = "SELECT * FROM saved_queries WHERE username = '".DECOMPOSE_USER."' AND query = '".$sqlquery."'";
 	$checkresult = mysqli_query($con,$check);
 	if($checkresult->num_rows > 0){
 		// Delete query from table
-		$sql = "DELETE FROM saved_queries WHERE username = '".TU_USER."' AND query = '".$sqlquery."'";
+		$sql = "DELETE FROM saved_queries WHERE username = '".DECOMPOSE_USER."' AND query = '".$sqlquery."'";
 
 		if (!mysqli_query($con,$sql)) {
 		  die('Error: ' . mysqli_error($con));
