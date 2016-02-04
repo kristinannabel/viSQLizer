@@ -2,8 +2,8 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $tableResult=array();) {
-		
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array()) {
+		if(($tablename == "savedQueries") || ($tablename == "databaseTables")){
 		?>
 
 		<table class='table table-bordered <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
@@ -39,6 +39,89 @@ class tbl{
 				} ?>
 		</table>
 		<?php
+		}else{
+			if($step <= count($tableName[0])){
+				$counter = $step-1;
+				$query = "SELECT * FROM " . $tableName[0][$counter];
+				$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+				$tableResult = mysqli_query($con, $query);
+				
+				for($j = 0; $j < $tableResult->num_rows; $j++){
+					$finalTbResult[] = mysqli_fetch_array($tableResult);
+				}
+		?>
+		
+		<table class='table table-bordered original table <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+			<tr> 
+	
+				<?php
+					$keys = array_keys($finalTbResult[0]);
+					// Table headings:
+					if($show_headings){
+						for($k=1; $k < count($keys); $k+= 2) {
+							echo '<th class="' . $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';	
+						} 
+					}  
+					unset($keys);
+					?>
+			</tr>
+			<?php
+				// Table data:
+				for($m=0; $m < count($finalTbResult); $m++){ ?>
+					<tr>
+						<?php 				
+							for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
+								echo '<td><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+							}?>
+					</tr>
+					<?php
+				} ?>
+		</table> 
+		<?php
+			}else{
+				for($i = 0; $i < $step; $i++){
+					if($i < count($tableName[0])){
+						$query = "SELECT * FROM " . $tableName[0][$i];
+						$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+						$tableResult = mysqli_query($con, $query);
+						
+						for($j = 0; $j < $tableResult->num_rows; $j++){
+							$finalTbResult[] = mysqli_fetch_array($tableResult);
+						}
+				?>
+				
+				<table class='table table-bordered original table <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+					<tr> 
+			
+						<?php
+							$keys = array_keys($finalTbResult[0]);
+							// Table headings:
+							if($show_headings){
+								for($k=1; $k < count($keys); $k+= 2) {
+									echo '<th class="' . $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';	
+								} 
+							}  
+							unset($keys);
+							?>
+					</tr>
+					<?php
+						// Table data:
+						for($m=0; $m < count($finalTbResult); $m++){ ?>
+							<tr>
+								<?php 				
+									for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
+										echo '<td><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+									}?>
+							</tr>
+							<?php
+						} ?>
+				</table>
+				<?php
+					}
+					unset($finalTbResult);
+				}
+			}
+		
 		if($empty){?>
 		<table class='table table-bordered empty-table' id='empty-table'>
 			<tr> 
@@ -59,7 +142,7 @@ class tbl{
 						<tr>
 							<?php 				
 								for($j=0; $j<count($result[$i])/2; $j++) {
-									echo '<td><span class="span_'.$j.'">' . $result[$i][$j] . '</span></td>';
+									echo '<td><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';
 							}?>
 						</tr>
 						<?php
@@ -67,11 +150,8 @@ class tbl{
 			</table>
 		<?php	
 		}
-		?>
-		<?php
-
 	}
-
+	}
 }
 
 ?>

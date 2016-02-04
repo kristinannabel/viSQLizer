@@ -282,6 +282,9 @@
 			$query = "SELECT * FROM " . $tableName[0][0];
 			$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 			$tableResult = mysqli_query($con, $query);
+			for($i = 0; $i < $tableResult->num_rows; $i++){
+				$finalTbResult[] = mysqli_fetch_array($tableResult);
+			}
 			//print_r($tableResult);
 			
 			$numOfSteps = $this->getTotalSteps();
@@ -296,7 +299,7 @@
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true, "dbtable", true, $tableResult);
+					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName);
 				}
 			}
 			echo "</div>";

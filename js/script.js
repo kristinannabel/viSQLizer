@@ -1,4 +1,8 @@
 $(document).ready(function(){
+	/*$(document).on("click", ".decompose", function(e) {
+		//e.preventDefault();
+		setTablesCanvas();
+    });
 	/*$lastImageH = 0;
 	$lastImageW = 0;
 	$totalImageH = 0;
@@ -87,6 +91,38 @@ $(document).ready(function(){
 	
 	//$('input[name="pagemode"]:checked').prop("disabled", true);
 	
+	function setTableCanvas(){
+			if($(".streammode-panel").length != 0){
+				debugger;
+	        	var stage = new createjs.Stage("demoCanvas");
+	  			var canvas = document.getElementById("demoCanvas");
+	  			var table = document.getElementById("main-panel streammode-panel");
+	  			var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
+
+	  	  		
+				//stage.update();
+				//debugger;
+	  			//move it's rotation center at the center of the form
+	  			formDOMElement.regX = table.offsetWidth*0.5;
+	  			formDOMElement.regY = table.offsetHeight*0.5;
+				
+	  	  		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
+	  			stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
+	  			//move the form above the screen
+	  			formDOMElement.x = canvas.width * 0.5;
+	  			formDOMElement.y = canvas.height * -0.50;
+
+	        	stage.addChild(formDOMElement);
+	        	stage.update();
+	  	  		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
+	  			for(var i = 0; i < thCount; i++){
+	  				var spanName = ".span_" + i;
+	  				$(".empty-table").find(spanName).css("visibility","hidden");
+	  			}
+			}
+		
+	}
+	
 	function setActiveStep(anum){
 		var thisStep = ".step" + anum;
 		$(".wizard-footer").find(thisStep).addClass("active");
@@ -121,6 +157,7 @@ $(document).ready(function(){
 		var query = $('#sql-query-input').val();
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
+			setTableCanvas();
 			setActiveStep(anum);
 		});
 		
@@ -138,6 +175,7 @@ $(document).ready(function(){
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
+				setTableCanvas();
 				setActiveStep(anum);
 			});
 		}
@@ -159,6 +197,7 @@ $(document).ready(function(){
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
+				setTableCanvas();
 				setActiveStep(anum);
 			});
 		}
@@ -223,7 +262,7 @@ $(document).ready(function(){
 	$('.savedQueries').on( 'click', '.edit_button',function(e){
 		var query = $(this).parent().parent().children(':first-child').text();
 		$('#sql-query-input').val(query);
-		document.cookie = "stepnumber=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+		//setTablesCanvas();
 		$('.decompose').click();
 	});
 	

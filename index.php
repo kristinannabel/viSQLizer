@@ -17,6 +17,7 @@
 			<script type="text/javascript" src="js/script.js"></script>
 			<script src="livequery/jquery.livequery.js"></script>
 			<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
+			<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
 			
 			
             <?php 
@@ -34,30 +35,52 @@
 			?>  
 				
 		<script>      
-		      function init() {
-		        var stage = new createjs.Stage("demoCanvas");
-				var canvas = document.getElementById("demoCanvas");
-				var table = document.getElementById("main-panel streammode-panel");
-				var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
-				
-				stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
-				stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
-				
-				//move it's rotation center at the center of the form
-				formDOMElement.regX = table.offsetWidth*0.5;
-				formDOMElement.regY = table.offsetHeight*0.6;
-				//move the form above the screen
-				formDOMElement.x = canvas.width * 0.5;
-				formDOMElement.y =  - 200;
-				
-		        stage.addChild(formDOMElement);
-		        stage.update();
-				var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
-				for(var i = 0; i < thCount; i++){
-					var spanName = ".span_" + i;
-					$(spanName).css("visibility","hidden");
+			function init() {
+				if($(".streammode-panel").length != 0){
+		        	var stage = new createjs.Stage("demoCanvas");
+		  			var canvas = document.getElementById("demoCanvas");
+		  			var table = document.getElementById("main-panel streammode-panel");
+		  			var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
+	
+		  	  		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
+		  			stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
+		  			//move it's rotation center at the center of the form
+		  			formDOMElement.regX = table.offsetWidth*0.5;
+		  			formDOMElement.regY = table.offsetHeight*0.5;
+		  			//move the form above the screen
+		  			formDOMElement.x = canvas.width * 0.5;
+		  			formDOMElement.y = canvas.height * -0.50; //- 200;
+	
+		        	stage.addChild(formDOMElement);
+		        	//stage.update();
+		  	  		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
+		  			for(var i = 0; i < thCount; i++){
+		  				var spanName = ".span_" + i;
+		  				$(".empty-table").find(spanName).css("visibility","hidden");
+		  			}
+					
+					var textDOM = new createjs.DOMElement("span_0");
+					stage.addChild(textDOM);
+		  		  	createjs.Tween.get(textDOM, {loop: false})
+					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+					
+					var textDOM1 = new createjs.DOMElement("span_1");
+					stage.addChild(textDOM1);
+		  		  	createjs.Tween.get(textDOM1, {loop: false})
+					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+					
+					var textDOM2 = new createjs.DOMElement("span_2");
+					stage.addChild(textDOM2);
+		  		  	createjs.Tween.get(textDOM2, {loop: false})
+					.to({y: 216}, 1000, createjs.Ease.getPowInOut(1));
+		          	  //.to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
+		           	  //.to({alpha: 0, y: 125}, 100)
+		          	  //.to({alpha: 1, y: 100}, 500, createjs.Ease.getPowInOut(2))
+		           	  //.to({x: 100}, 800, createjs.Ease.getPowInOut(2));
+		         	createjs.Ticker.setFPS(60);
+		         	createjs.Ticker.addEventListener("tick", stage);
 				}
-		      }
+			}
 		</script>
     </head>
     <body onload="init();">
@@ -176,23 +199,5 @@
 				</div>
 			</div>
 		</div>
-		<div class="imageContainer" style="visibility:hidden;">
-			<div class="Course">
-				<img class="code" src="/viSQLizer/Course/code.png">
-				<img src="/viSQLizer/Course/name.png">
-				<img src="/viSQLizer/Course/data_code.png">
-				<img src="/viSQLizer/Course/data_name.png">
-				<img src="/viSQLizer/Course/data_code_2.png">
-				<img src="/viSQLizer/Course/data_name_2.png">
-			</div>
-			<div class="Exam">
-			</div>
-			<div class="Student">
-			</div>
-		</div>
-		<!--<canvas id="canvas" class="hide" width="300" height="300"></canvas>-->
     </body>
-		<script>
-	
-		</script>
 </html>
