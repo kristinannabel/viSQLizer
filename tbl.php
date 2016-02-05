@@ -52,7 +52,7 @@ class tbl{
 				$thisTableName = $tableName[0][$counter];
 		?>
 		
-		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 			<tr> 
 	
 				<?php
@@ -92,7 +92,7 @@ class tbl{
 						$thisTableName = $tableName[0][$i];
 				?>
 				
-				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 					<tr> 
 			
 						<?php

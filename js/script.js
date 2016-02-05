@@ -213,7 +213,7 @@ $(document).ready(function(){
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
-				setTableCanvas();
+				init();
 				setActiveStep(anum);
 			});
 		}
@@ -235,7 +235,7 @@ $(document).ready(function(){
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
-				setTableCanvas();
+				init();
 				setActiveStep(anum);
 			});
 		}

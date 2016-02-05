@@ -56,20 +56,20 @@
 		  	  		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		  			for(var i = 0; i < thCount; i++){
 		  				var spanName = ".span_" + i;
-		  				//$(".empty-table").find(spanName).css("visibility","hidden");
+		  				$(".empty-table").find(spanName).css("visibility","hidden");
 		  			}
 					
 					
 					
 					
-					if($(".org-db-table").length != 0){ 
+					//if($(".org-db-table").length != 0){ 
 						var numberOfTables = $(".original-table").length;
 						var tableRows = $("#empty-table").find("tr.data").length;
 						var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
 						//debugger;
 						var timeCount = 1500;
-						for(var i = 0; i < tableRows; i++){ //for each row
-							for(var j = 0; j < tableColumns; j++){ //for each column in one row
+						for(var i = 0; i < tableRows; i++) (function(i){ //for each row
+							for(var j = 0; j < tableColumns; j++) (function(j){ //for each column in one row
 								//debugger;
 								var rowCount = i + 2;
 								var columnCount = j + 1;
@@ -80,57 +80,76 @@
 								}).first().attr("id","animThis").next();
 								//$(".original-table").find('span:contains("'+textContent+'"):first').attr("id","animThis").next();
 								
-								var originalPos = $(".original-table").find("span#animThis").filter(function() {
-																	// Matches exact string   
-																	return $(this).html() === textContent;
-																}).first().position().top;
+								var originalPosY = $(".original-table").find("span#animThis").filter(function() {
+									// Matches exact string   
+									return $(this).html() === textContent;
+								}).first().position().top;
 								//$(".original-table").find('span:contains("'+textContent+'"):first').position().top;
-								var emptyPos = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().top;
-								var calcPosition = emptyPos - originalPos;
+								var emptyPosY = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().top;
+								var emptyPosX = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().left;
+								if(numberOfTables > 1){
+									//debugger;
+									var thisTableTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
+									var thisTable = "#" + thisTableTemp;
+									var orPosX = $(thisTable).find("span#animThis").position().left;
+								}
+								else {
+									var orPosX = 									$(".original-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().left;
+								}
+								var calcPositionY = emptyPosY - originalPosY;
+								var calcPositionX = emptyPosX - orPosX;
 								var thisDOMElem = $("#animThis:not(.used)").get(0);
 								var textDOM = new createjs.DOMElement(thisDOMElem);
 								stage.addChild(textDOM);
-					  		  	createjs.Tween.get(textDOM, {loop: false})
-								.wait(timeCount)
-								.to({y: calcPosition}, 1000, createjs.Ease.getPowIn(1));
-								//console.log($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position());
-								getTextOrigin.show();
-								$(".original-table").find("span#animThis").filter(function() {
-																	// Matches exact string   
-																	return $(this).html() === textContent;
-																}).first().removeAttr("id").addClass("used");
-							}
+								if(numberOfTables > 1){
+									getTextOrigin.show();
+					  		  		createjs.Tween.get(textDOM, {loop: false})
+									.wait(timeCount)
+									.to({y: calcPositionY, x: calcPositionX}, 1000, createjs.Ease.getPowIn(1))
+									.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+									.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+								} else {
+					  		  		createjs.Tween.get(textDOM, {loop: false})
+									.wait(timeCount)
+									.to({y: calcPositionY, x: calcPositionX}, 1000, createjs.Ease.getPowIn(1));
+									//console.log($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position());
+									getTextOrigin.show();
+								}
+								//$(".original-table").find("span:not(.used)").contains(textContent);
+								if(numberOfTables > 1){
+									var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
+									var thisTableId = "#" +thisTableIdTemp;
+									var countOfDuplicates = $(thisTableId).find("span:not(.used):contains('"+textContent+"')").length;
+									if(countOfDuplicates > 1){
+										$(".original-table").find("span#animThis").filter(function() {
+											// Matches exact string   
+											return $(this).html() === textContent;
+										}).first().removeAttr("id").addClass("used");
+									}else{
+										$(".original-table").find("span#animThis").filter(function() {
+											// Matches exact string   
+											return $(this).html() === textContent;
+										}).first().removeAttr("id");
+									}
+								}
+								else {
+									$(".original-table").find("span#animThis").filter(function() {
+										// Matches exact string   
+										return $(this).html() === textContent;
+									}).first().removeAttr("id").addClass("used");
+								}
+								
+								function tweenComplete(){
+									var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
+									emptyTextPlace.css("visibility", "visible");
+								}
+								
+							})(j);
 							timeCount += 1500;
-						}
-					}
+						
+						})(i);
 					
 					
-					/*var textDOM = new createjs.DOMElement("span_0");
-					stage.addChild(textDOM);
-		  		  	createjs.Tween.get(textDOM, {loop: false})
-					.wait(1500)
-					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
-					$("#original-td_0").find(".original-span_0").show();
-					
-					var textDOM1 = new createjs.DOMElement("span_1");
-					stage.addChild(textDOM1);
-		  		  	createjs.Tween.get(textDOM1, {loop: false})
-					.wait(1500)
-					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
-					$("#original-td_0").find(".original-span_1").show();
-					
-					var textDOM2 = new createjs.DOMElement("span_2");
-					stage.addChild(textDOM2);
-		  		  	createjs.Tween.get(textDOM2, {loop: false})
-					.wait(1500)
-					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
-					$("#original-td_0").find(".original-span_2").show();*/
-					
-		          	  //.to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
-		           	  //.to({alpha: 0, y: 216}, 100)
-					//.to({alpha: 1, y: 0}, 100);
-		          	  //.to({alpha: 1, y: 100}, 500, createjs.Ease.getPowInOut(2))
-		           	  //.to({x: 100}, 800, createjs.Ease.getPowInOut(2));
 		         	createjs.Ticker.setFPS(60);
 		         	createjs.Ticker.addEventListener("tick", stage);
 				}
