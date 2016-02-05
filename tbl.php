@@ -49,9 +49,10 @@ class tbl{
 				for($j = 0; $j < $tableResult->num_rows; $j++){
 					$finalTbResult[] = mysqli_fetch_array($tableResult);
 				}
+				$thisTableName = $tableName[0][$counter];
 		?>
 		
-		<table class='table table-bordered original table <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
 			<tr> 
 	
 				<?php
@@ -68,17 +69,17 @@ class tbl{
 			<?php
 				// Table data:
 				for($m=0; $m < count($finalTbResult); $m++){ 
-					echo '<tr id="original-td_'.$m.'">';
+					echo '<tr id="data">';
 									
 							for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-								echo '<td class="original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+								echo '<td class="original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 							}?>
 					</tr>
 					<?php
 				} ?>
 		</table> 
 		<?php
-			}else{
+			}else{ //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
 				for($i = 0; $i < $step; $i++){
 					if($i < count($tableName[0])){
 						$query = "SELECT * FROM " . $tableName[0][$i];
@@ -88,9 +89,10 @@ class tbl{
 						for($j = 0; $j < $tableResult->num_rows; $j++){
 							$finalTbResult[] = mysqli_fetch_array($tableResult);
 						}
+						$thisTableName = $tableName[0][$i];
 				?>
 				
-				<table class='table table-bordered original table <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
+				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $tablename; ?>'>
 					<tr> 
 			
 						<?php
@@ -107,11 +109,11 @@ class tbl{
 					<?php
 						// Table data:
 						for($m=0; $m < count($finalTbResult); $m++){ 
-							echo '<tr id="original-td_'.$m.'">';
+							echo '<tr id="data">';
 												
 									for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
 										echo '<td class="original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span>
-											<span id="original-span" class="original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+											<span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 									}?>
 							</tr>
 							<?php
@@ -140,7 +142,7 @@ class tbl{
 				<?php
 					// Table data:
 					for($i=0; $i < count($result); $i++){ ?>
-						<tr>
+						<tr class="data">
 							<?php 				
 								for($j=0; $j<count($result[$i])/2; $j++) {
 									echo '<td><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';

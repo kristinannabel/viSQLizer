@@ -56,12 +56,56 @@
 		  	  		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		  			for(var i = 0; i < thCount; i++){
 		  				var spanName = ".span_" + i;
-		  				$(".empty-table").find(spanName).css("visibility","hidden");
+		  				//$(".empty-table").find(spanName).css("visibility","hidden");
 		  			}
 					
 					
 					
-					var textDOM = new createjs.DOMElement("span_0");
+					
+					if($(".org-db-table").length != 0){ 
+						var numberOfTables = $(".original-table").length;
+						var tableRows = $("#empty-table").find("tr.data").length;
+						var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
+						//debugger;
+						var timeCount = 1500;
+						for(var i = 0; i < tableRows; i++){ //for each row
+							for(var j = 0; j < tableColumns; j++){ //for each column in one row
+								//debugger;
+								var rowCount = i + 2;
+								var columnCount = j + 1;
+								var textContent = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").html();
+								var getTextOrigin = $(".original-table").find("span:not(.used)").filter(function(){
+									// Matches exact string
+									return $(this).html() === textContent;
+								}).first().attr("id","animThis").next();
+								//$(".original-table").find('span:contains("'+textContent+'"):first').attr("id","animThis").next();
+								
+								var originalPos = $(".original-table").find("span#animThis").filter(function() {
+																	// Matches exact string   
+																	return $(this).html() === textContent;
+																}).first().position().top;
+								//$(".original-table").find('span:contains("'+textContent+'"):first').position().top;
+								var emptyPos = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().top;
+								var calcPosition = emptyPos - originalPos;
+								var thisDOMElem = $("#animThis:not(.used)").get(0);
+								var textDOM = new createjs.DOMElement(thisDOMElem);
+								stage.addChild(textDOM);
+					  		  	createjs.Tween.get(textDOM, {loop: false})
+								.wait(timeCount)
+								.to({y: calcPosition}, 1000, createjs.Ease.getPowIn(1));
+								//console.log($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position());
+								getTextOrigin.show();
+								$(".original-table").find("span#animThis").filter(function() {
+																	// Matches exact string   
+																	return $(this).html() === textContent;
+																}).first().removeAttr("id").addClass("used");
+							}
+							timeCount += 1500;
+						}
+					}
+					
+					
+					/*var textDOM = new createjs.DOMElement("span_0");
 					stage.addChild(textDOM);
 		  		  	createjs.Tween.get(textDOM, {loop: false})
 					.wait(1500)
@@ -80,7 +124,7 @@
 		  		  	createjs.Tween.get(textDOM2, {loop: false})
 					.wait(1500)
 					.to({y: 216}, 1000, createjs.Ease.getPowIn(1));
-					$("#original-td_0").find(".original-span_2").show();
+					$("#original-td_0").find(".original-span_2").show();*/
 					
 		          	  //.to({alpha: 0, y: 75}, 500, createjs.Ease.getPowInOut(2))
 		           	  //.to({alpha: 0, y: 216}, 100)

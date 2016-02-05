@@ -90,18 +90,13 @@ $(document).ready(function(){
 	
 	
 	//$('input[name="pagemode"]:checked').prop("disabled", true);
-	
 	function setTableCanvas(){
-			if($(".streammode-panel").length != 0){
-				debugger;
+			if($(".streammode-panel").length != 0){ //do not do this until a table is in the DOM
 	        	var stage = new createjs.Stage("demoCanvas");
 	  			var canvas = document.getElementById("demoCanvas");
 	  			var table = document.getElementById("main-panel streammode-panel");
 	  			var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
 
-	  	  		
-				//stage.update();
-				//debugger;
 	  			//move it's rotation center at the center of the form
 	  			formDOMElement.regX = table.offsetWidth*0.5;
 	  			formDOMElement.regY = table.offsetHeight*0.5;
@@ -120,9 +115,47 @@ $(document).ready(function(){
 	  				$(".empty-table").find(spanName).css("visibility","hidden");
 	  			}
 			}
+			if($(".org-db-table").length != 0){ // do not do this if the shown table is the original DB table, not result table
+				debugger;
+				var tableRows = $("#empty-table").find("tr.data").length;
+				var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
+				var timeCount = 1500;
+					for(var i = 0; i < tableRows; i++){ //for each row
+						for(var j = 0; j < tableColumns; j++){ //for each column in one row
+							//debugger;
+							var rowCount = i + 2;
+							var columnCount = j + 1;
+							var textContent = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").html();
+							var getTextOrigin = $(".original-table").find("span").filter(function() {
+								// Matches exact string   
+								return $(this).html() === textContent;
+							}).first().attr("id","animThis").next();
+							//$(".original-table").find('span:contains("'+textContent+'"):first').attr("id","animThis").next();
+							
+							var originalPos = $(".original-table").find("span").filter(function() {
+																// Matches exact string   
+																return $(this).html() === textContent;
+															}).first().position().top;
+							//$(".original-table").find('span:contains("'+textContent+'"):first').position().top;
+							var emptyPos = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().top;
+							var calcPosition = emptyPos - originalPos;
+							var textDOM = new createjs.DOMElement("animThis");
+							stage.addChild(textDOM);
+				  		  	createjs.Tween.get(textDOM, {loop: false})
+							.wait(timeCount)
+							.to({y: calcPosition}, 1000, createjs.Ease.getPowIn(1));
+							//console.log($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position());
+							getTextOrigin.show();
+							$(".original-table").find("span").filter(function() {
+																// Matches exact string   
+																return $(this).html() === textContent;
+															}).first().removeAttr("id");
+						}
+						timeCount += 1500;
+					}
+			}
 		
 	}
-	
 	function setActiveStep(anum){
 		var thisStep = ".step" + anum;
 		$(".wizard-footer").find(thisStep).addClass("active");
@@ -148,6 +181,10 @@ $(document).ready(function(){
 		}
 	}
 	
+	/*$('.streammode-panel').bind("DOMSubtreeModified",function(){
+		init();
+	});*/
+	
 	$(document).on("click", ".wizard-footer .step a", function(e) {
 		e.preventDefault();
 		var stepnum = $(this).html();//get clicked step
@@ -157,7 +194,8 @@ $(document).ready(function(){
 		var query = $('#sql-query-input').val();
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
-			setTableCanvas();
+			init();
+			//setTableCanvas();
 			setActiveStep(anum);
 		});
 		
