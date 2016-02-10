@@ -35,3 +35,10 @@
 #original-span {
 	display: none;
 }
+#demoCanvas {
+    z-index: 2;
+    position: relative;
+}
+.panel.panel-default.streammode-panel#main-panel#streammode-panel {
+	z-index: 1;
+}

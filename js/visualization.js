@@ -59,6 +59,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 					}
 					else if((!thisGetTextOrigin.first().parent().siblings().find("span:not(#original-span)").hasClass("used")) && ((isNotFirstColumn) && (prevEmptyTableColumn != prevOriginalTableColumn))){
 						// If this element is first to be used in row even if it is not first element
+						// This test does not work if AS is set on column names in query
 						isRightElem = true;
 						return $(thisGetTextOrigin[0]).attr("id","animThis").next(); //TEST THIS; SEEMS WRONG IF isNotFirstColumn is false???
 					}
@@ -91,18 +92,20 @@ function init() {
 		var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
 
 		// Set canvas size to size of all tables in SQL view
-  		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
+  		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2 + 200;
 		stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
 		
 		// Move the DOMElement at the center of the form
-		formDOMElement.regX = table.offsetWidth*0.5;
+		formDOMElement.regX = table.offsetWidth*0.5+100;
 		formDOMElement.regY = table.offsetHeight*0.5;
 		// Move the form to right possition
 		formDOMElement.x = canvas.width * 0.5;
 		formDOMElement.y = canvas.height * -0.50;
-
+		
     	stage.addChild(formDOMElement);
     	stage.update();
+		
+		$("#main-panel#streammode-panel").css("z-index", "1");
 		
   		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		setViewToEmptyTable(thCount);
@@ -159,7 +162,7 @@ function init() {
 						
 				// Y position of the element in the original table
 				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
-						
+				var originalPosX = 	$(".streammode-panel").width();
 				// Y position of the element in the empty-table
 				var emptyPosY = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin)").position().top;
 				// X position of the element in the empty-table
@@ -185,11 +188,18 @@ function init() {
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
+			   
+				var line = new createjs.Shape();
+				line.graphics.setStrokeStyle(3);
+				line.graphics.beginStroke("#000000");
+				line.graphics.moveTo(originalPosX - 11, originalPosY + (17/2) + 2); // X, Y
+				line.graphics.lineTo(600, emptyPosY + (17/2) + 2);
+  				stage.addChild(line);
 				
+				console.log("LINE: " + stage.getChildIndex(line) + "DOM: " + stage.getChildIndex(formDOMElement));
 				// If there is more than one original-table
 				if(numberOfTables > 1){
-					// Show the text in the original-table
-					getTextOrigin.show();
+					
 					// Animate the DOMElement in position set
 			  		createjs.Tween.get(textDOM, {loop: false})
 					.wait(timeCount).call(tweenStart)
@@ -197,6 +207,9 @@ function init() {
 					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
 					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
 					// call to dunction tweenComplete after animation is completed
+					
+					// Show the text in the original-table
+					getTextOrigin.show();
 				} else {
 					// Animate the DOMElement in position set
 			  		createjs.Tween.get(textDOM, {loop: false})
