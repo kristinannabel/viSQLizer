@@ -1,66 +1,104 @@
+/**
+ * Function for setting text in empty-table to non-visible, 
+ * and shorten the text of all spans who are higher than text-height
+ */
+function setViewToEmptyTable(thCount){
+	for(var i = 0; i < thCount; i++){
+		var spanName = ".span_" + i;
+		$(".empty-table").find(spanName).css("visibility","hidden");
+		$(".empty-table").find(".textOrigin").hide();
+		var numOfSpans = $(".empty-table").find(spanName).length;
+		for(var j = 0; j < numOfSpans; j++){
+			while ($(".empty-table").find(spanName).eq(j).height()>16) {
+				// While this element has height grater than 16
+		    	$(".empty-table").find(spanName).eq(j).text(function (index, text) {
+		        	return text.replace(/\W*\s(\S)*$/, '...');
+					// Cut last word out, replace with '...'
+		    	});
+			}
+		}			
+	}
+}
+
+/*
+ * Initial function for the animation and canvas visualizations
+ * Is run onload of DOM body
+ */
 function init() {
+	// Do not run if no table is present in DOM
 	if($(".streammode-panel").length != 0){
-		
+		// Initial settings for the canvas
     	var stage = new createjs.Stage("demoCanvas");
 		var canvas = document.getElementById("demoCanvas");
 		var table = document.getElementById("main-panel streammode-panel");
 		var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
 
+		// Set canvas size to size of all tables in SQL view
   		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2;
 		stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
-		//move it's rotation center at the center of the form
+		
+		// Move the DOMElement at the center of the form
 		formDOMElement.regX = table.offsetWidth*0.5;
 		formDOMElement.regY = table.offsetHeight*0.5;
-		//move the form above the screen
+		// Move the form to right possition
 		formDOMElement.x = canvas.width * 0.5;
 		formDOMElement.y = canvas.height * -0.50;
 
     	stage.addChild(formDOMElement);
     	stage.update();
+		
   		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
-		for(var i = 0; i < thCount; i++){
-			var spanName = ".span_" + i;
-			$(".empty-table").find(spanName).css("visibility","hidden");
-			$(".empty-table").find(".textOrigin").hide();
-			var numOfSpans = $(".empty-table").find(spanName).length;
-			for(var j = 0; j < numOfSpans; j++){
-				while ($(".empty-table").find(spanName).eq(j).height()>16) {
-			    	$(".empty-table").find(spanName).eq(j).text(function (index, text) {
-			        	return text.replace(/\W*\s(\S)*$/, '...');
-			    	});
-				}
-			}			
-		}
+		setViewToEmptyTable(thCount);
+		
+		// Number of tables in SQL view
 		var numberOfTables = $(".original-table").length;
+		// Number of rows in empty-table
 		var tableRows = $("#empty-table").find("tr.data").length;
+		// Number of columns in empty table
 		var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
+		//Inital timecount - ms wait before the animation starts on page-load
 		var timeCount = 1500;
-		for(var i = 0; i < tableRows; i++) (function(i){ //for each row
-			for(var j = 0; j < tableColumns; j++) (function(j){ //for each column in one row
+		
+		// Lopp through each row in empty-table (the last table in DOM-view with query result)
+		for(var i = 0; i < tableRows; i++) (function(i){
+			// Loop through each column on this (i) row in empty table
+			for(var j = 0; j < tableColumns; j++) (function(j){
+				// Set rowCount. +2 because it should start at 1 and because the first row does not contain data
 				var rowCount = i + 2;
+				// Set columnCount. +1 because it should start at 1
 				var columnCount = j + 1;
+				
+				// Getting the text of this data element in empty-table
 				var textContent = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span.textOrigin").html();
-				var emptyContains = $("#empty-table").find("span:contains('"+textContent+"')").length;
-						
+				
+				// Getting how many elements in this row (in empty-table) is equal to the text of this data-element
 				var numOfThisElem = $("#empty-table").find("tr:nth-child("+rowCount+")").find("span.textOrigin:contains('"+textContent+"')").length;
+				// How many of these elements is not used jet
 				var numOfThisElemNotUsed = $("#empty-table").find("tr:nth-child("+rowCount+")").find("span.textOrigin:not(.used):contains('"+textContent+"')").length;
+				// The index for the element
 				var elemNumInRow = numOfThisElem - numOfThisElemNotUsed;
+				// Add class used to this element, so it is not used again
 				$("#empty-table").find("tr:nth-child("+rowCount+")").find("span.textOrigin:contains('"+textContent+"')").eq(elemNumInRow).addClass("used");
 						
+						
 				if(elemNumInRow > 0){
-							var thisGetTextOrigin = $(".original-table").find("span:not(.used):not(.duplicate)").filter(function(){
-									return $(this).html() === textContent;
-							});
-						}
+					// A similar element has been used before in this row, so do not get the ones marked duplicate or used
+					var thisGetTextOrigin = $(".original-table").find("span:not(.used):not(.duplicate)").filter(function(){
+							return $(this).html() === textContent;
+					});
+				}
 				else {
-							var thisGetTextOrigin = $(".original-table").find("span:not(.used)").filter(function(){
-									return $(this).html() === textContent;
-							});
-						}
+					// This is the first or only similar element in this row, do not get a used element
+					var thisGetTextOrigin = $(".original-table").find("span:not(.used)").filter(function(){
+						return $(this).html() === textContent;
+					});
+				}
 						
 				var isRightElem = false;
 				var thisTable = thisGetTextOrigin.first().parent().parent().parent().parent();
 				var duplData = $(thisTable).find("span:not(.used):contains('"+textContent+"')").length;
+				
+				
 				var columnIndexOriginal = thisGetTextOrigin.first().parent().index();
 				var columnIndexEmpty = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").index();
 				var isNotFirstColumn = false;
