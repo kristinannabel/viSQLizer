@@ -14,6 +14,7 @@
 			<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 			<script type="text/javascript" src="js/bootstrap.min.js"></script>
 			<script src="pixi/bin/pixi.js"></script>
+			<script type="text/javascript" src="js/visualization.js"></script>
 			<script type="text/javascript" src="js/script.js"></script>
 			<script src="livequery/jquery.livequery.js"></script>
 			<script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
