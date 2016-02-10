@@ -137,15 +137,16 @@ class tbl{
 						for($i=1; $i < count($keys); $i+= 2) {
 							echo '<th class="' . $keys[$i] . '"><p>' . $keys[$i] . '</p></th>';	
 						} 
-				}?>
+					}?>
 			</tr>
 				<?php
 					// Table data:
-					for($i=0; $i < count($result); $i++){ ?>
-						<tr class="data">
-							<?php 				
-								for($j=0; $j<count($result[$i])/2; $j++) {
-									echo '<td><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';
+					for($i=0; $i < count($result); $i++){ 
+						$thisRow = $i+1; 
+						echo '<tr class="data" id="row_'.$thisRow.'">';
+											
+							for($j=0; $j<count($result[$i])/2; $j++) {
+								echo '<td><span class="textOrigin"  >' . $result[$i][$j] . '</span><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';
 							}?>
 						</tr>
 						<?php
