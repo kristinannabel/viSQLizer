@@ -72,7 +72,7 @@
 						
 						<?php	
 					}?>
-					<canvas id="demoCanvas" width="500" height="300" style="z-index: 2; position: relative;"></canvas>
+					<canvas id="demoCanvas" width="500" height="300" style="z-index: 2; position: relative; pointer-events: none;"></canvas>
 					<?php
 					if (isset($sql) && $sql != "")
 					{

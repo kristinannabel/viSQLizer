@@ -188,15 +188,75 @@ function init() {
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
-			   
-				var line = new createjs.Shape();
-				line.graphics.setStrokeStyle(3);
-				line.graphics.beginStroke("#000000");
-				line.graphics.moveTo(originalPosX - 11, originalPosY + (17/2) + 2); // X, Y
-				line.graphics.lineTo(600, emptyPosY + (17/2) + 2);
-  				stage.addChild(line);
 				
-				console.log("LINE: " + stage.getChildIndex(line) + "DOM: " + stage.getChildIndex(formDOMElement));
+				
+				createjs.MotionGuidePlugin.install();
+
+				var arrowStartPosY = originalPosY + (17/2) + 2;
+				var arrowStartPosX = originalPosX - 11;
+				var arrowEndPosY = emptyPosY + (17/2) + 2;
+				var middlePosY = ((arrowEndPosY - arrowStartPosY) / 2 ) + arrowStartPosY;
+				
+				var shape = new createjs.Shape();
+				var bar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
+				stage.addChild(shape);
+				
+			    var image = new createjs.Bitmap("arrow.png");
+				image.alpha = 0;
+			    stage.addChild(image);
+				
+				createjs.Ticker.addEventListener("tick", tick);
+
+				run();
+
+				function getMotionPathFromPoints (points) {
+					console.log(points);
+					var i, motionPath;
+					console.log(points.length);
+					for (i = 0, motionPath = []; i < points.length - 1; ++i) {
+						if (i === 0) {
+							motionPath.push(points[i].x, points[i].y);
+						} /*else {
+							motionPath.push(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
+						}*/
+						else if(i === 1){
+					    	motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+						} else {
+					    	i++;
+							motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+						}
+					}
+
+					return motionPath;
+				}
+				
+				function run() {
+				    var points = [
+ 			   			new createjs.Point(arrowStartPosX, arrowStartPosY),
+   			 			new createjs.Point(arrowStartPosX + 200, middlePosY),
+  			  			new createjs.Point(arrowStartPosX, arrowEndPosY)
+				    ];
+    
+				    createjs.Tween.get(bar).wait(timeCount).to({
+				        guide: {path: getMotionPathFromPoints(points)}
+				    }, 1500, createjs.circOut);
+					
+					createjs.Tween.get(image).to({rotation: -70}, 0).wait(timeCount).to({alpha: 1}, 0).to({rotation: -290, guide:{ path:[arrowStartPosX - 20, arrowStartPosY + 23, arrowStartPosX + 140, middlePosY - 20, arrowStartPosX + 20, arrowEndPosY - 33], orient: "auto" }},1500);
+				}
+
+				function tick() {
+				    shape.graphics
+				        .setStrokeStyle(2, 'round', 'round')
+				        .beginStroke("#000000")
+				        .curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
+				        .endStroke();
+    
+				    stage.update();
+    
+				    bar.oldx = bar.x;
+				    bar.oldy = bar.y;
+				}
+				
 				// If there is more than one original-table
 				if(numberOfTables > 1){
 					
