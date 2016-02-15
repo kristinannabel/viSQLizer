@@ -1,5 +1,66 @@
 $( document ).ready(function() {
 	
+	/* For when user hovers one of the cells in the empty-table */
+	$("#empty-table").find("td").live('mouseover', function(){
+		var columnIndexEmpty = $(this).index();
+	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
+		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
+		var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").length;
+		for(var i = 0; i < numberOfColumnsInThisTable; i++){
+			if(i == 0){
+				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).css("background-color", "#fcf8e3");
+			} else {
+				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).css("background-color", "#fcf8e3");
+			}
+		}
+		debugger;
+		var thisText = $(this).find("span").first().html();
+		var columnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
+		columnIndex = columnIndex + 1;
+		var thisTextOriginal = $(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("td:nth-of-type(" + columnIndex + ")").find("span#original-span").filter(function(){
+			return $(this).html() === thisText;
+		});
+		
+		if(thisTextOriginal.length > 1){
+			var foundCorrectCell = false;
+			while(foundCorrectCell == false){
+				var thisRow = $(this).parent().index();
+				thisRow = thisRow - 1;
+				if(thisTextOriginal.first().parent().parent().find("td[class*='usedInRow_" + thisRow + "']").length != 0){
+					thisTextOriginal.first().parent().parent().css("background-color", "#fcf8e3");
+					thisTextOriginal.first().parent().css("background-color", "#fcf8c3");
+					foundCorrectCell = true;
+				}
+				else {
+					thisTextOriginal.first().addClass("notInUse");
+					var thisTextOriginal = $(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("td:nth-of-type(" + columnIndex + ")").find("span#original-span:not(.notInUse)").filter(function(){
+						return $(this).html() === thisText;
+					});
+				}
+			}
+		}
+		else{
+			thisTextOriginal.parent().parent().css("background-color", "#fcf8e3");
+			thisTextOriginal.parent().css("background-color", "#fcf8c3");
+		}
+		
+		
+	}).live("mouseout", function() {
+   		var columnIndexEmpty = $(this).index();
+   	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
+   		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
+   		var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").length;
+		$(".original-table").find("tr").removeAttr('style');
+		$(".original-table").find("td").removeAttr('style');
+   		for(var i = 0; i < numberOfColumnsInThisTable; i++){
+   			if(i == 0){
+   				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).removeAttr('style');
+   			} else {
+   				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).removeAttr('style');
+   			}
+   		}
+	});
+	
 	/** Operations for stream mode **/
 	
 	function setActiveStep(anum){

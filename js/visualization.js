@@ -61,7 +61,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 						// If this element is first to be used in row even if it is not first element
 						// This test does not work if AS is set on column names in query
 						isRightElem = true;
-						return $(thisGetTextOrigin[0]).attr("id","animThis").next(); //TEST THIS; SEEMS WRONG IF isNotFirstColumn is false???
+						return $(thisGetTextOrigin[0]).attr("id","animThis").next();
 					}
 					else{
 						// This element is not the right one, find next occurence
@@ -103,7 +103,7 @@ function init() {
 		formDOMElement.y = canvas.height * -0.50;
 		
     	stage.addChild(formDOMElement);
-    	stage.update();
+    	//stage.update();
 		
 		$("#main-panel#streammode-panel").css("z-index", "1");
 		
@@ -190,26 +190,186 @@ function init() {
 				stage.addChild(textDOM);
 				
 				
-				createjs.MotionGuidePlugin.install();
+				
+				// If there is more than one original-table
+				if(numberOfTables > 1){
+					
+					// Animate the DOMElement in position set
+			  		createjs.Tween.get(textDOM, {loop: false})
+					.wait(timeCount).call(tweenStart)
+					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+					// call to dunction tweenComplete after animation is completed
+					
+					// Show the text in the original-table
+					getTextOrigin.show();
+				} else {
+					// Animate the DOMElement in position set
+			  		createjs.Tween.get(textDOM, {loop: false})
+					.wait(timeCount-400).call(tweenStart)
+					.to({scaleX: 1.5}, 200)
+					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+					.to({scaleX: 1}, 200)
+					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+					getTextOrigin.show();
+				}
+				
+				// If there is more than one original-table
+				if(numberOfTables > 1){
+					var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
+					var thisTableId = "#" +thisTableIdTemp;
+					var countOfDuplicates = $(thisTableId).find("span:not(#original-span):contains('"+textContent+"')").length;
+					// If there is duplicates of this element in this table
+					if(countOfDuplicates > 1){
+						$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+					}
+					else{
+						var duplicatesInAllTables = $(".original-table").find("span:not(.used):contains('"+textContent+"')").length;
+						// If there is duplicates of this element in both original-tables together
+						if(duplicatesInAllTables > countOfDuplicates){
+							//This is a duplicate, mark as one
+							$(".original-table").find("span#animThis").first().addClass("duplicate").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+						}
+						// remove id animThis from element
+						$(".original-table").find("span#animThis").first().removeAttr("id");
+					}
+				}
+				else {
+					// Element is used and used in row
+					$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+				}
+				
+				/**
+				 * Function for when animation is completed
+				 * Shows the hidden text in empty-table
+				 */
+				function tweenComplete(){
+					var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
+					emptyTextPlace.css("visibility", "visible");
+				}
+				
+				/**
+				 * Function for when tween is starting
+				 * Sets the background color for the selected row in the original table
+				 */
+				function tweenStart(){
+					$(this.htmlElement.parentElement.parentElement).addClass("usedBlue");
+				}
+						
+			})(j);
+			
+			// Counting up the time counter for the animations by 2000ms
+			
+			
+			//Plugin for creating a guide for animating arrows in an arc
+			createjs.MotionGuidePlugin.install();
+			var originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").first().position().top;
+			var originalPosX = 	$(".streammode-panel").width();
+			var emptyPosY = $("#empty-table").find("tr:nth-child("+(i+2)+")").find("span:not(.textOrigin)").position().top;
 
-				var arrowStartPosY = originalPosY + (17/2) + 2;
-				var arrowStartPosX = originalPosX - 11;
-				var arrowEndPosY = emptyPosY + (17/2) + 2;
+			var arrowStartPosY = originalPosY + (17/2) + 2;
+			var arrowStartPosX = originalPosX - 11;
+			var arrowEndPosY = emptyPosY + (17/2) + 2;
+			var middlePosY = ((arrowEndPosY - arrowStartPosY) / 2 ) + arrowStartPosY;
+			
+			var shape = new createjs.Shape();
+			var bar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
+			stage.addChild(shape);
+			
+		    var image = new createjs.Bitmap("arrow.png");
+			image.alpha = 0;
+		    stage.addChild(image);
+			
+			createjs.Ticker.addEventListener("tick", tick);
+
+			run();
+
+			function getMotionPathFromPoints (points) {
+				console.log(points);
+				var i, motionPath;
+				console.log(points.length);
+				for (i = 0, motionPath = []; i < points.length - 1; ++i) {
+					if (i === 0) {
+						motionPath.push(points[i].x, points[i].y);
+					} /*else {
+						motionPath.push(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
+					}*/
+					else if(i === 1){
+				    	motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+					} else {
+				    	i++;
+						motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+					}
+				}
+
+				return motionPath;
+			}
+			
+			function run() {
+				var posXStart = arrowStartPosX + 200;
+			    var points = [
+		   			new createjs.Point(arrowStartPosX, arrowStartPosY),
+		 			new createjs.Point(posXStart, middlePosY),
+		  			new createjs.Point(arrowStartPosX, arrowEndPosY)
+			    ];
+
+			    createjs.Tween.get(bar).wait(timeCount-400).to({
+			        guide: {path: getMotionPathFromPoints(points)}
+			    }, 1900);
+				
+				var startImgPosY = arrowStartPosY + 23;
+				var startImgPosX = arrowStartPosX - 20;
+				var middleImgPosY = middlePosY - 20;
+				var middleImgPosX = arrowStartPosX + 140;
+				var endImgPosY = arrowEndPosY - 33;
+				var endImgPosX = arrowStartPosX + 20;
+				
+				createjs.Tween.get(image).to({rotation: -70}, 0)
+				.wait(timeCount-400).to({alpha: 1}, 0)
+				.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900);
+			}
+
+			function tick() {
+			    shape.graphics
+			        .setStrokeStyle(2, 'round', 'round')
+			        .beginStroke("#000000")
+			        .curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
+			        .endStroke();
+				
+				if(typeof shape2 !== 'undefined'){
+			    shape2.graphics
+			        .setStrokeStyle(2, 'round', 'round')
+			        .beginStroke("#000000")
+			        .curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
+			        .endStroke();
+					
+				    bahar.oldx = bahar.x;
+				    bahar.oldy = bahar.y;
+				}
+				
+			    //stage.update();
+				
+			    bar.oldx = bar.x;
+			    bar.oldy = bar.y;
+			}
+			if(numberOfTables === 2){
+				originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").last().position().top;
+
+				arrowStartPosY = originalPosY + (17/2) + 2;
 				var middlePosY = ((arrowEndPosY - arrowStartPosY) / 2 ) + arrowStartPosY;
-				
-				var shape = new createjs.Shape();
-				var bar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
-				stage.addChild(shape);
-				
+			
+				var shape2 = new createjs.Shape();
+				var bahar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
+				stage.addChild(shape2);
+			
 			    var image = new createjs.Bitmap("arrow.png");
 				image.alpha = 0;
 			    stage.addChild(image);
 				
-				createjs.Ticker.addEventListener("tick", tick);
-
-				run();
-
-				function getMotionPathFromPoints (points) {
+				//createjs.Ticker.addEventListener("tick", tick);
+				function getMotionPathFromPoints2 (points) {
 					console.log(points);
 					var i, motionPath;
 					console.log(points.length);
@@ -230,107 +390,41 @@ function init() {
 					return motionPath;
 				}
 				
-				function run() {
+				function runner() {
+					var posXStart = arrowStartPosX + 200;
 				    var points = [
- 			   			new createjs.Point(arrowStartPosX, arrowStartPosY),
-   			 			new createjs.Point(arrowStartPosX + 200, middlePosY),
-  			  			new createjs.Point(arrowStartPosX, arrowEndPosY)
+			   			new createjs.Point(arrowStartPosX, arrowStartPosY),
+			 			new createjs.Point(posXStart, middlePosY),
+			  			new createjs.Point(arrowStartPosX, arrowEndPosY)
 				    ];
-    
-				    createjs.Tween.get(bar).wait(timeCount).to({
-				        guide: {path: getMotionPathFromPoints(points)}
-				    }, 1500, createjs.circOut);
-					
-					createjs.Tween.get(image).to({rotation: -70}, 0).wait(timeCount).to({alpha: 1}, 0).to({rotation: -290, guide:{ path:[arrowStartPosX - 20, arrowStartPosY + 23, arrowStartPosX + 140, middlePosY - 20, arrowStartPosX + 20, arrowEndPosY - 33], orient: "auto" }},1500);
-				}
 
-				function tick() {
-				    shape.graphics
-				        .setStrokeStyle(2, 'round', 'round')
-				        .beginStroke("#000000")
-				        .curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
-				        .endStroke();
-    
-				    stage.update();
-    
-				    bar.oldx = bar.x;
-				    bar.oldy = bar.y;
+				    createjs.Tween.get(bahar).wait(timeCount-400).to({
+				        guide: {path: getMotionPathFromPoints2(points)}
+				    }, 1900);
+				
+					var startImgPosY = arrowStartPosY + 23;
+					var startImgPosX = arrowStartPosX - 20;
+					var middleImgPosY = middlePosY - 20;
+					var middleImgPosX = arrowStartPosX + 140;
+					var endImgPosY = arrowEndPosY - 33;
+					var endImgPosX = arrowStartPosX + 20;
+				
+					createjs.Tween.get(image).to({rotation: -70}, 0)
+					.wait(timeCount-400).to({alpha: 1}, 0)
+					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900);
 				}
 				
-				// If there is more than one original-table
-				if(numberOfTables > 1){
-					
-					// Animate the DOMElement in position set
-			  		createjs.Tween.get(textDOM, {loop: false})
-					.wait(timeCount).call(tweenStart)
-					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-					// call to dunction tweenComplete after animation is completed
-					
-					// Show the text in the original-table
-					getTextOrigin.show();
-				} else {
-					// Animate the DOMElement in position set
-			  		createjs.Tween.get(textDOM, {loop: false})
-					.wait(timeCount).call(tweenStart)
-					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1));
-					getTextOrigin.show();
-				}
-				
-				// If there is more than one original-table
-				if(numberOfTables > 1){
-					var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
-					var thisTableId = "#" +thisTableIdTemp;
-					var countOfDuplicates = $(thisTableId).find("span:not(#original-span):contains('"+textContent+"')").length;
-					// If there is duplicates of this element in this table
-					if(countOfDuplicates > 1){
-						$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow");
-					}
-					else{
-						var duplicatesInAllTables = $(".original-table").find("span:not(.used):contains('"+textContent+"')").length;
-						// If there is duplicates of this element in both original-tables together
-						if(duplicatesInAllTables > countOfDuplicates){
-							//This is a duplicate, mark as one
-							$(".original-table").find("span#animThis").first().addClass("duplicate").parent().addClass("usedInRow");
-						}
-						// remove id animThis from element
-						$(".original-table").find("span#animThis").first().removeAttr("id");
-					}
-				}
-				else {
-					// Element is used and used in row
-					$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow");
-				}
-				
-				/**
-				 * Function for when animation is completed
-				 * Shows the hidden text in empty-table
-				 */
-				function tweenComplete(){
-					var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
-					emptyTextPlace.css("visibility", "visible");
-				}
-				
-				/**
-				 * Function for when tween is starting
-				 * Sets the background color for the selected row in the original table
-				 */
-				function tweenStart(){
-					$(this.htmlElement.parentElement.parentElement).css("background-color", "#d9edf7");
-				}
-						
-			})(j);
+				runner();
+			}
 			
-			// Counting up the time counter for the animations by 2000ms
 			timeCount += 2000;
-			
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 		})(i);
 		
 		// Framework settings for animations
-        createjs.Ticker.setFPS(60);
+        createjs.Ticker.setFPS(30);
         createjs.Ticker.addEventListener("tick", stage);
+		//createjs.Ticker.reset();
 	}
 }

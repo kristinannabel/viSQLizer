@@ -42,3 +42,6 @@
 .panel.panel-default.streammode-panel#main-panel#streammode-panel {
 	z-index: 1;
 }
+.usedBlue {
+	background-color: #d9edf7;
+}
