@@ -116,6 +116,11 @@
 		</div> <!-- class="col-md-9 -->
 		<div class="col-md-3 menu">
 			<div class="menu-content">
+				<h5>Text animation</h5>
+				<div class="radio"> <label> <input type="radio" name="animation" value="normal"> Normal animation </label> </div>
+				<div class="radio"> <label> <input type="radio" name="animation" value="synchronous"> Synchronous animation </label> </div>
+				<div class="checkbox"> <label> <input type="checkbox" name="dragout" value="dragout"> Drag-out animation </label> </div>
+				<div class="checkbox"> <label> <input type="checkbox" name="bigtext" value="bigtext"> Big text animation </label> </div>
 				<div class="panel panel-info">
 				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> Database tables</h3></div>
 					<?php

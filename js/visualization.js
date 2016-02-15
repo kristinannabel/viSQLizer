@@ -195,25 +195,48 @@ function init() {
 				if(numberOfTables > 1){
 					
 					// Animate the DOMElement in position set
-			  		createjs.Tween.get(textDOM, {loop: false})
-					.wait(timeCount).call(tweenStart)
-					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-					// call to dunction tweenComplete after animation is completed
+					if(localStorage['bigtext'] == "false"){
+				  		createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount).call(tweenStart)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						// call to dunction tweenComplete after animation is completed
+					}
+					else {
+				  		createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount-400).call(tweenStart)
+						.to({scaleX: 1.5}, 200)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({scaleX: 1}, 200)
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						// call to dunction tweenComplete after animation is completed
+					}
+			  		
 					
 					// Show the text in the original-table
 					getTextOrigin.show();
 				} else {
 					// Animate the DOMElement in position set
-			  		createjs.Tween.get(textDOM, {loop: false})
-					.wait(timeCount-400).call(tweenStart)
-					.to({scaleX: 1.5}, 200)
-					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-					.to({scaleX: 1}, 200)
-					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-					getTextOrigin.show();
+					if(localStorage['bigtext'] == "false"){
+			  			createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount).call(tweenStart)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						getTextOrigin.show();
+					}
+					else {
+			  			createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount-400).call(tweenStart)
+						.to({scaleX: 1.5}, 200)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({scaleX: 1}, 200)
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						getTextOrigin.show();
+					}
 				}
 				
 				// If there is more than one original-table
@@ -255,7 +278,7 @@ function init() {
 				 * Sets the background color for the selected row in the original table
 				 */
 				function tweenStart(){
-					$(this.htmlElement.parentElement.parentElement).addClass("usedBlue");
+					$(this.htmlElement.parentElement).addClass("usedBlue");
 				}
 						
 			})(j);
@@ -287,15 +310,11 @@ function init() {
 			run();
 
 			function getMotionPathFromPoints (points) {
-				console.log(points);
 				var i, motionPath;
-				console.log(points.length);
 				for (i = 0, motionPath = []; i < points.length - 1; ++i) {
 					if (i === 0) {
 						motionPath.push(points[i].x, points[i].y);
-					} /*else {
-						motionPath.push(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
-					}*/
+					}
 					else if(i === 1){
 				    	motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 					} else {
@@ -339,7 +358,7 @@ function init() {
 			        .endStroke();
 				
 				if(typeof shape2 !== 'undefined'){
-			    shape2.graphics
+					shape2.graphics
 			        .setStrokeStyle(2, 'round', 'round')
 			        .beginStroke("#000000")
 			        .curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
@@ -347,6 +366,7 @@ function init() {
 					
 				    bahar.oldx = bahar.x;
 				    bahar.oldy = bahar.y;
+					
 				}
 				
 			    //stage.update();
@@ -370,9 +390,7 @@ function init() {
 				
 				//createjs.Ticker.addEventListener("tick", tick);
 				function getMotionPathFromPoints2 (points) {
-					console.log(points);
 					var i, motionPath;
-					console.log(points.length);
 					for (i = 0, motionPath = []; i < points.length - 1; ++i) {
 						if (i === 0) {
 							motionPath.push(points[i].x, points[i].y);
@@ -416,8 +434,10 @@ function init() {
 				
 				runner();
 			}
-			
-			timeCount += 2000;
+			// Remove this for animating all at once!
+			if(localStorage['animation'] == "normal"){
+				timeCount += 2000;
+			}
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 		})(i);

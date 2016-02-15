@@ -1,4 +1,67 @@
 $( document ).ready(function() {
+	// Session for storing choice of animation
+	var setAnimation = localStorage['animation'];
+	
+	if(!setAnimation){
+		localStorage['animation'] = "normal";
+		$(".radio").find("input[value='normal']").prop('checked', true);
+	}
+	else{
+		$(".radio").find("input[value='" + setAnimation + "']").prop('checked', true);
+	}
+	
+	$("input[name='animation']").change(function(){
+		localStorage['animation'] = $(this).val();
+	});
+	
+	// Session for storing if drag-out animation is set or not
+	var setDragOut = localStorage['dragout'];
+	
+	if(!setDragOut){
+		localStorage['dragout'] = false;
+		var setDragOut = localStorage['dragout'];
+		$(".checkbox").find("input[name='dragout']").prop('checked', false);
+	}
+	
+	if(setDragOut == "false"){
+		$(".checkbox").find("input[name='dragout']").prop('checked', false);
+	}
+	else {
+		$(".checkbox").find("input[name='dragout']").prop('checked', true);
+	}
+	
+	$("input[name='dragout']").change(function(){
+		if($(this).prop('checked')){
+			localStorage['dragout'] = true;
+		}
+		else {
+			localStorage['dragout'] = false;
+		}
+	});
+	
+	// Session for storing if animation should have big text or not
+	var setBigText = localStorage['bigtext'];
+	if(!setBigText){
+		localStorage['bigtext'] = false;
+		var setBigText = localStorage['bigtext'];
+		$(".checkbox").find("input[name='bigtext']").prop('checked', false);
+	}
+	
+	if(setBigText == "false"){
+		$(".checkbox").find("input[name='bigtext']").prop('checked', false);
+	}
+	else {
+		$(".checkbox").find("input[name='bigtext']").prop('checked', true);
+	}
+	
+	$("input[name='bigtext']").change(function(){
+		if($(this).prop('checked')){
+			localStorage['bigtext'] = true;
+		}
+		else {
+			localStorage['bigtext'] = false;
+		}
+	});
 	
 	/* For when user hovers one of the cells in the empty-table */
 	$("#empty-table").find("td").live('mouseover', function(){
@@ -13,7 +76,6 @@ $( document ).ready(function() {
 				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).css("background-color", "#fcf8e3");
 			}
 		}
-		debugger;
 		var thisText = $(this).find("span").first().html();
 		var columnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
 		columnIndex = columnIndex + 1;
@@ -27,7 +89,7 @@ $( document ).ready(function() {
 				var thisRow = $(this).parent().index();
 				thisRow = thisRow - 1;
 				if(thisTextOriginal.first().parent().parent().find("td[class*='usedInRow_" + thisRow + "']").length != 0){
-					thisTextOriginal.first().parent().parent().css("background-color", "#fcf8e3");
+					thisTextOriginal.first().parent().parent().children("td").css("background-color", "#fcf8e3");
 					thisTextOriginal.first().parent().css("background-color", "#fcf8c3");
 					foundCorrectCell = true;
 				}
@@ -40,7 +102,7 @@ $( document ).ready(function() {
 			}
 		}
 		else{
-			thisTextOriginal.parent().parent().css("background-color", "#fcf8e3");
+			thisTextOriginal.parent().parent().children("td").css("background-color", "#fcf8e3")
 			thisTextOriginal.parent().css("background-color", "#fcf8c3");
 		}
 		
