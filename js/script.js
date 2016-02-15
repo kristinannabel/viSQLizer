@@ -50,6 +50,7 @@ $( document ).ready(function() {
    	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
    		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
    		var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").length;
+		$(".original-table").find("span").removeClass("notInUse");
 		$(".original-table").find("tr").removeAttr('style');
 		$(".original-table").find("td").removeAttr('style');
    		for(var i = 0; i < numberOfColumnsInThisTable; i++){
