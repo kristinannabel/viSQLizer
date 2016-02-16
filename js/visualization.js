@@ -85,12 +85,12 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 function init() {
 	// Do not run if no table is present in DOM
 	if($(".streammode-panel").length != 0){
+		$lastElemIsDone = false;
 		// Initial settings for the canvas
     	var stage = new createjs.Stage("demoCanvas");
 		var canvas = document.getElementById("demoCanvas");
 		var table = document.getElementById("main-panel streammode-panel");
 		var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
-
 		// Set canvas size to size of all tables in SQL view
   		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2 + 200;
 		stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
@@ -162,6 +162,7 @@ function init() {
 						
 				// Y position of the element in the original table
 				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
+				var orgPosXElem = $(".original-table").find("span#animThis").first().position().left;
 				var originalPosX = 	$(".streammode-panel").width();
 				// Y position of the element in the empty-table
 				var emptyPosY = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin)").position().top;
@@ -184,10 +185,13 @@ function init() {
 				// Calculated position X from the original position and result position
 				var calcPositionX = emptyPosX - orPosX;
 				
+				//$("#animThis:not(.used)").wrap( "<div class='whiteBrick'></div>" );
+				
 				var thisDOMElem = $("#animThis:not(.used)").get(0);
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
+				stage.setChildIndex( textDOM, stage.getNumChildren()-1);
 				
 				
 				
@@ -195,7 +199,7 @@ function init() {
 				if(numberOfTables > 1){
 					
 					// Animate the DOMElement in position set
-					if(localStorage['bigtext'] == "false"){
+					if((localStorage['bigtext'] == "false") && (localStorage['dragout'] == "false")){
 				  		createjs.Tween.get(textDOM, {loop: false})
 						.wait(timeCount).call(tweenStart)
 						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
@@ -203,10 +207,35 @@ function init() {
 						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
 						// call to dunction tweenComplete after animation is completed
 					}
-					else {
+					else if((localStorage['bigtext'] == "true") && (localStorage['dragout'] == "false")){
 				  		createjs.Tween.get(textDOM, {loop: false})
 						.wait(timeCount-400).call(tweenStart)
 						.to({scaleX: 1.5}, 200)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({scaleX: 1}, 200)
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						// call to dunction tweenComplete after animation is completed
+					}
+					else if((localStorage['bigtext'] == "false") && (localStorage['dragout'] == "true")){
+						
+				  		createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount).call(tweenStart)
+						//drag to x position outside of panel
+						//drag down to right y position
+						//drag to right x position
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						// call to dunction tweenComplete after animation is completed
+					}
+					else if((localStorage['bigtext'] == "true") && (localStorage['dragout'] == "true")){
+				  		createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount-400).call(tweenStart)
+						.to({scaleX: 1.5}, 200)
+						//drag to x position outside of panel
+						//drag down to right y position
+						//drag to right x position
 						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
 						.to({scaleX: 1}, 200)
 						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
@@ -285,7 +314,7 @@ function init() {
 			
 			// Counting up the time counter for the animations by 2000ms
 			
-			
+			if(localStorage['dragout'] == 'false'){
 			//Plugin for creating a guide for animating arrows in an arc
 			createjs.MotionGuidePlugin.install();
 			var originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").first().position().top;
@@ -304,7 +333,6 @@ function init() {
 		    var image = new createjs.Bitmap("arrow.png");
 			image.alpha = 0;
 		    stage.addChild(image);
-			
 			createjs.Ticker.addEventListener("tick", tick);
 
 			run();
@@ -334,9 +362,16 @@ function init() {
 		  			new createjs.Point(arrowStartPosX, arrowEndPosY)
 			    ];
 
-			    createjs.Tween.get(bar).wait(timeCount-400).to({
-			        guide: {path: getMotionPathFromPoints(points)}
-			    }, 1900);
+				if(localStorage['bigtext'] == "false"){
+			    	createjs.Tween.get(bar).wait(timeCount).to({
+			        	guide: {path: getMotionPathFromPoints(points)}
+			    	}, 1500).call(lastArrowAnimateComplete);
+				}
+				else {
+			    	createjs.Tween.get(bar).wait(timeCount-400).to({
+			        	guide: {path: getMotionPathFromPoints(points)}
+			    	}, 1900).call(lastArrowAnimateComplete);
+				}
 				
 				var startImgPosY = arrowStartPosY + 23;
 				var startImgPosX = arrowStartPosX - 20;
@@ -345,35 +380,67 @@ function init() {
 				var endImgPosY = arrowEndPosY - 33;
 				var endImgPosX = arrowStartPosX + 20;
 				
-				createjs.Tween.get(image).to({rotation: -70}, 0)
-				.wait(timeCount-400).to({alpha: 1}, 0)
-				.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900);
+				if(localStorage['bigtext'] == "false"){
+					createjs.Tween.get(image).to({rotation: -70}, 0)
+					.wait(timeCount).to({alpha: 1}, 0)
+					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1500)
+					.to({alpha: 0}, 3000);
+				}
+				else {
+					createjs.Tween.get(image).to({rotation: -70}, 0)
+					.wait(timeCount-400).to({alpha: 1}, 0)
+					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900)
+					.to({alpha: 0}, 3800);
+				}
 			}
 
 			function tick() {
-			    shape.graphics
+				if(!$lastElemIsDone){
+			    	shape.graphics
 			        .setStrokeStyle(2, 'round', 'round')
 			        .beginStroke("#000000")
 			        .curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
 			        .endStroke();
 				
-				if(typeof shape2 !== 'undefined'){
-					shape2.graphics
-			        .setStrokeStyle(2, 'round', 'round')
-			        .beginStroke("#000000")
-			        .curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
-			        .endStroke();
+					if(typeof shape2 !== 'undefined'){
+						shape2.graphics
+			       	 	.setStrokeStyle(2, 'round', 'round')
+			       		.beginStroke("#000000")
+			        	.curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
+			       		.endStroke();
 					
-				    bahar.oldx = bahar.x;
-				    bahar.oldy = bahar.y;
-					
-				}
+				   	 	bahar.oldx = bahar.x;
+				  	 	bahar.oldy = bahar.y;	
+					}
+				
 				
 			    //stage.update();
 				
-			    bar.oldx = bar.x;
-			    bar.oldy = bar.y;
+			    	bar.oldx = bar.x;
+			    	bar.oldy = bar.y;
+				}
 			}
+			
+			function removeShapeFromStage(){
+				stage.removeChild(shape);
+			}
+			function removeShape2FromStage(){
+				stage.removeChild(shape2);
+			}
+			
+			
+			function lastArrowAnimateComplete(){
+				//shape.alpha = 0;
+				createjs.Tween.get(shape).to({alpha: 0}, 3000).call(removeShapeFromStage);
+				if(numberOfTables === 2){ 
+					createjs.Tween.get(shape2).to({alpha: 0}, 3000).call(removeShape2FromStage);
+				}
+				if(i == (tableRows-1)){
+					$lastElemIsDone = true;
+					
+				}
+			}
+			
 			if(numberOfTables === 2){
 				originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").last().position().top;
 
@@ -416,9 +483,16 @@ function init() {
 			  			new createjs.Point(arrowStartPosX, arrowEndPosY)
 				    ];
 
-				    createjs.Tween.get(bahar).wait(timeCount-400).to({
-				        guide: {path: getMotionPathFromPoints2(points)}
-				    }, 1900);
+					if(localStorage['bigtext'] == "false"){
+				    	createjs.Tween.get(bahar).wait(timeCount).to({
+				        	guide: {path: getMotionPathFromPoints2(points)}
+				    	}, 1500).call(lastArrowAnimateComplete);
+					}
+					else {
+				    	createjs.Tween.get(bahar).wait(timeCount-400).to({
+				        	guide: {path: getMotionPathFromPoints2(points)}
+				    	}, 1900).call(lastArrowAnimateComplete);
+					}
 				
 					var startImgPosY = arrowStartPosY + 23;
 					var startImgPosX = arrowStartPosX - 20;
@@ -427,12 +501,23 @@ function init() {
 					var endImgPosY = arrowEndPosY - 33;
 					var endImgPosX = arrowStartPosX + 20;
 				
-					createjs.Tween.get(image).to({rotation: -70}, 0)
-					.wait(timeCount-400).to({alpha: 1}, 0)
-					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900);
+					if(localStorage['bigtext'] == "false"){
+						createjs.Tween.get(image).to({rotation: -70}, 0)
+						.wait(timeCount).to({alpha: 1}, 0)
+						.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1500)
+						.to({alpha: 0}, 3000);
+					}
+					else {
+						createjs.Tween.get(image).to({rotation: -70}, 0)
+						.wait(timeCount-400).to({alpha: 1}, 0)
+						.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900)
+						.to({alpha: 0}, 3800);
+					}
 				}
 				
 				runner();
+				
+			}
 			}
 			// Remove this for animating all at once!
 			if(localStorage['animation'] == "normal"){
@@ -441,7 +526,6 @@ function init() {
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 		})(i);
-		
 		// Framework settings for animations
         createjs.Ticker.setFPS(30);
         createjs.Ticker.addEventListener("tick", stage);

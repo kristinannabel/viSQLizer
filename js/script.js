@@ -1,4 +1,5 @@
 $( document ).ready(function() {
+	
 	// Session for storing choice of animation
 	var setAnimation = localStorage['animation'];
 	
@@ -65,6 +66,7 @@ $( document ).ready(function() {
 	
 	/* For when user hovers one of the cells in the empty-table */
 	$("#empty-table").find("td").live('mouseover', function(){
+		$(this).css("background-color", "#fcf8c3");
 		var columnIndexEmpty = $(this).index();
 	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
 		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
@@ -108,6 +110,7 @@ $( document ).ready(function() {
 		
 		
 	}).live("mouseout", function() {
+		$(this).removeAttr('style');
    		var columnIndexEmpty = $(this).index();
    	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
    		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();
@@ -164,8 +167,8 @@ $( document ).ready(function() {
 		var query = $('#sql-query-input').val();
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
+			
 			init();
-			//setTableCanvas();
 			setActiveStep(anum);
 		});
 		
