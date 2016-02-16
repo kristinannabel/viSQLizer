@@ -118,7 +118,7 @@ function init() {
 		var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		//Inital timecount - ms wait before the animation starts on page-load
 		var timeCount = 1500;
-		
+		var zIndexNum = tableRows*2;
 		// Lopp through each row in empty-table (the last table in DOM-view with query result)
 		for(var i = 0; i < tableRows; i++) (function(i){
 			// Loop through each column on this (i) row in empty table
@@ -183,42 +183,46 @@ function init() {
 				// Calculated position Y from the original position and result position
 				var calcPositionY = emptyPosY - originalPosY;
 				// Calculated position X from the original position and result position
-				var calcPositionX = emptyPosX - orPosX;
+				if(emptyPosX > orPosX){
+					var calcPositionX = emptyPosX - orPosX;
+				}
+				else{
+					var calcPositionX =  orPosX - emptyPosX;
+				}
 				
-				//$("#animThis:not(.used)").wrap( "<div class='whiteBrick'></div>" );
+				var thisDOMElem = $("#animThis:not(.used)").addClass("whiteBrick").css("z-index", zIndexNum).get(0);
 				
-				var thisDOMElem = $("#animThis:not(.used)").get(0);
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
-				stage.setChildIndex( textDOM, stage.getNumChildren()-1);
 				
+				var animThisIndex = $("#animThis:not(.used)").parent().index();
+				var prevElementWidth = $("#animThis:not(.used)").parent().prev().find("span").first().width();
+				if((animThisIndex > 0) && (prevElementWidth*2 >= orgPosXElem)){
+					var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
+				}
+				else {
+					var changeXPosition = 0;
+				}
 				
+				animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition );
 				
-				// If there is more than one original-table
-				if(numberOfTables > 1){
-					
-					// Animate the DOMElement in position set
-					if((localStorage['bigtext'] == "false") && (localStorage['dragout'] == "false")){
-				  		createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount).call(tweenStart)
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						// call to dunction tweenComplete after animation is completed
+				function animateTextFromDOM(bigText, dragOut, changeXPosition){
+					var scaleX = 1;
+					var scaleY = 1;
+					var scaleTime = 0;
+					var newTimeCount = 0;
+					calcScalePositionX = calcPositionX;
+					if(bigText == "true"){
+						scaleX = 1.5;
+						scaleY = 1.5;
+						scaleTime = 300;
+						newTimeCount = 600;
+						if(changeXPosition > 0){
+							calcPositionX = changeXPosition;
+						}
 					}
-					else if((localStorage['bigtext'] == "true") && (localStorage['dragout'] == "false")){
-				  		createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount-400).call(tweenStart)
-						.to({scaleX: 1.5}, 200)
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-						.to({scaleX: 1}, 200)
-						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						// call to dunction tweenComplete after animation is completed
-					}
-					else if((localStorage['bigtext'] == "false") && (localStorage['dragout'] == "true")){
-						
+					if(dragOut == "true"){
 				  		createjs.Tween.get(textDOM, {loop: false})
 						.wait(timeCount).call(tweenStart)
 						//drag to x position outside of panel
@@ -227,45 +231,17 @@ function init() {
 						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
 						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
 						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						// call to dunction tweenComplete after animation is completed
+						// call to function tweenComplete after animation is completed
 					}
-					else if((localStorage['bigtext'] == "true") && (localStorage['dragout'] == "true")){
-				  		createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount-400).call(tweenStart)
-						.to({scaleX: 1.5}, 200)
-						//drag to x position outside of panel
-						//drag down to right y position
-						//drag to right x position
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-						.to({scaleX: 1}, 200)
-						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						// call to dunction tweenComplete after animation is completed
-					}
-			  		
 					
-					// Show the text in the original-table
+		  			createjs.Tween.get(textDOM, {loop: false})
+					.wait(timeCount-newTimeCount).call(tweenStart)
+					.to({scaleX: scaleX, scaleY: scaleY, x: changeXPosition}, scaleTime)
+					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+					.to({scaleX: 1, scaleY: 1, x: calcScalePositionX}, scaleTime)
+					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
 					getTextOrigin.show();
-				} else {
-					// Animate the DOMElement in position set
-					if(localStorage['bigtext'] == "false"){
-			  			createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount).call(tweenStart)
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						getTextOrigin.show();
-					}
-					else {
-			  			createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount-400).call(tweenStart)
-						.to({scaleX: 1.5}, 200)
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-						.to({scaleX: 1}, 200)
-						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-						getTextOrigin.show();
-					}
 				}
 				
 				// If there is more than one original-table
@@ -300,6 +276,8 @@ function init() {
 				function tweenComplete(){
 					var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
 					emptyTextPlace.css("visibility", "visible");
+					$(this.htmlElement).removeClass("whiteBrick");
+					$(this.htmlElement).css("z-index", 1);
 				}
 				
 				/**
@@ -311,7 +289,7 @@ function init() {
 				}
 						
 			})(j);
-			
+			zIndexNum = zIndexNum-2;
 			// Counting up the time counter for the animations by 2000ms
 			
 			if(localStorage['dragout'] == 'false'){
@@ -368,9 +346,9 @@ function init() {
 			    	}, 1500).call(lastArrowAnimateComplete);
 				}
 				else {
-			    	createjs.Tween.get(bar).wait(timeCount-400).to({
+			    	createjs.Tween.get(bar).wait(timeCount-600).to({
 			        	guide: {path: getMotionPathFromPoints(points)}
-			    	}, 1900).call(lastArrowAnimateComplete);
+			    	}, 2100).call(lastArrowAnimateComplete);
 				}
 				
 				var startImgPosY = arrowStartPosY + 23;
@@ -388,8 +366,8 @@ function init() {
 				}
 				else {
 					createjs.Tween.get(image).to({rotation: -70}, 0)
-					.wait(timeCount-400).to({alpha: 1}, 0)
-					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900)
+					.wait(timeCount-600).to({alpha: 1}, 0)
+					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},2100)
 					.to({alpha: 0}, 3800);
 				}
 			}
