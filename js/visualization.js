@@ -118,7 +118,7 @@ function init() {
 		var tableColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		//Inital timecount - ms wait before the animation starts on page-load
 		var timeCount = 1500;
-		var zIndexNum = tableRows*2;
+		$zIndexNum = tableRows*tableColumns;
 		// Lopp through each row in empty-table (the last table in DOM-view with query result)
 		for(var i = 0; i < tableRows; i++) (function(i){
 			// Loop through each column on this (i) row in empty table
@@ -183,30 +183,25 @@ function init() {
 				// Calculated position Y from the original position and result position
 				var calcPositionY = emptyPosY - originalPosY;
 				// Calculated position X from the original position and result position
-				if(emptyPosX > orPosX){
-					var calcPositionX = emptyPosX - orPosX;
-				}
-				else{
-					var calcPositionX =  orPosX - emptyPosX;
-				}
-				
-				var thisDOMElem = $("#animThis:not(.used)").addClass("whiteBrick").css("z-index", zIndexNum).get(0);
+				var calcPositionX = emptyPosX - orPosX;
+
+				var thisDOMElem = $("#animThis").get(0);
 				
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
 				
-				var animThisIndex = $("#animThis:not(.used)").parent().index();
-				var prevElementWidth = $("#animThis:not(.used)").parent().prev().find("span").first().width();
-				if((animThisIndex > 0) && (prevElementWidth*2 >= orgPosXElem)){
-					var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
+				if(localStorage['bigtext'] == "true"){
+					var animThisIndex = $("#animThis:not(.used)").parent().index();
+					var prevElementWidth = $("#animThis:not(.used)").parent().prev().find("span").first().width();
+					if((animThisIndex > 0) && (prevElementWidth*2 >= orgPosXElem)){
+						var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
+					}
+					else {
+						var changeXPosition = 0;
+					}
 				}
-				else {
-					var changeXPosition = 0;
-				}
-				
 				animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition );
-				
 				function animateTextFromDOM(bigText, dragOut, changeXPosition){
 					var scaleX = 1;
 					var scaleY = 1;
@@ -274,8 +269,10 @@ function init() {
 				 * Shows the hidden text in empty-table
 				 */
 				function tweenComplete(){
+					$(this.htmlElement).html($(this.htmlElement).next().html());
+					
 					var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
-					emptyTextPlace.css("visibility", "visible");
+					emptyTextPlace.css("visibility", "visible"); //Check quick away and back
 					$(this.htmlElement).removeClass("whiteBrick");
 					$(this.htmlElement).css("z-index", 1);
 				}
@@ -285,11 +282,17 @@ function init() {
 				 * Sets the background color for the selected row in the original table
 				 */
 				function tweenStart(){
+					if($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").length > 0){
+						debugger;
+						$(this.htmlElement).html($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").html());
+					}
+					$(this.htmlElement).addClass("whiteBrick").css("z-index", $zIndexNum);
 					$(this.htmlElement.parentElement).addClass("usedBlue");
+					$zIndexNum = $zIndexNum-1;
 				}
 						
 			})(j);
-			zIndexNum = zIndexNum-2;
+			
 			// Counting up the time counter for the animations by 2000ms
 			
 			if(localStorage['dragout'] == 'false'){
@@ -368,7 +371,7 @@ function init() {
 					createjs.Tween.get(image).to({rotation: -70}, 0)
 					.wait(timeCount-600).to({alpha: 1}, 0)
 					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},2100)
-					.to({alpha: 0}, 3800);
+					.to({alpha: 0}, 3500);
 				}
 			}
 
@@ -408,15 +411,27 @@ function init() {
 			
 			
 			function lastArrowAnimateComplete(){
-				//shape.alpha = 0;
-				createjs.Tween.get(shape).to({alpha: 0}, 3000).call(removeShapeFromStage);
-				if(numberOfTables === 2){ 
-					createjs.Tween.get(shape2).to({alpha: 0}, 3000).call(removeShape2FromStage);
-				}
-				if(i == (tableRows-1)){
-					$lastElemIsDone = true;
+				if(localStorage['bigtext'] == "false"){
+					createjs.Tween.get(shape).to({alpha: 0}, 3000).call(removeShapeFromStage);
+					if(numberOfTables === 2){ 
+						createjs.Tween.get(shape2).to({alpha: 0}, 3000).call(removeShape2FromStage);
+					}
+					if(i == (tableRows-1)){
+						$lastElemIsDone = true;
 					
+					}
 				}
+				else {
+					createjs.Tween.get(shape).to({alpha: 0}, 3500).call(removeShapeFromStage);
+					if(numberOfTables === 2){ 
+						createjs.Tween.get(shape2).to({alpha: 0}, 3500).call(removeShape2FromStage);
+					}
+					if(i == (tableRows-1)){
+						$lastElemIsDone = true;
+					
+					}
+				}
+				
 			}
 			
 			if(numberOfTables === 2){
@@ -499,14 +514,19 @@ function init() {
 			}
 			// Remove this for animating all at once!
 			if(localStorage['animation'] == "normal"){
-				timeCount += 2000;
+				timeCount += 2200;
 			}
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 		})(i);
+		
 		// Framework settings for animations
         createjs.Ticker.setFPS(30);
         createjs.Ticker.addEventListener("tick", stage);
 		//createjs.Ticker.reset();
 	}
+}
+
+function stepClicked(){
+	createjs.Tween.removeAllTweens();
 }

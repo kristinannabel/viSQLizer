@@ -167,9 +167,9 @@ $( document ).ready(function() {
 		var query = $('#sql-query-input').val();
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
-			
-			init();
 			setActiveStep(anum);
+			init();
+			
 		});
 		
 	});
@@ -186,8 +186,9 @@ $( document ).ready(function() {
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
-				init();
 				setActiveStep(anum);
+				init();
+				
 			});
 		}
 		else { // if this is last step
@@ -208,8 +209,9 @@ $( document ).ready(function() {
 			var query = $('#sql-query-input').val();
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
-				init();
 				setActiveStep(anum);
+				init();
+				
 			});
 		}
 		else { // if this is last step

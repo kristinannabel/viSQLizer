@@ -307,7 +307,7 @@
 				echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#'>Previous</a></li>";
 				
 				for($i = 1; $i <= $numOfSteps; $i++){
-					echo "<li class='step step" . $i . "'><a id='astep".$i."' href='#'>" . $i . "</a></li>";
+					echo "<li class='step step" . $i . "'><a id='astep".$i."' href='#' onclick='stepClicked()'>" . $i . "</a></li>";
 				}
 				
 				echo "<li class='next'><a href='#'>Next</a></li></ul></div></div>";
