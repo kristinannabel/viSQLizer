@@ -218,25 +218,31 @@ function init() {
 						}
 					}
 					if(dragOut == "true"){
-				  		createjs.Tween.get(textDOM, {loop: false})
-						.wait(timeCount).call(tweenStart)
-						//drag to x position outside of panel
-						//drag down to right y position
-						//drag to right x position
-						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						
+						
+		  				createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount-newTimeCount).call(tweenStart)
+						.to({scaleX: scaleX, scaleY: scaleY, x: changeXPosition}, scaleTime)
+						.to({x: calcPositionX + 300}, 300, createjs.Ease.getPowIn(1))
+						.to({y: calcPositionY}, 900, createjs.Ease.getPowIn(1))
+						.to({x: calcPositionX}, 300, createjs.Ease.getPowIn(1))
+						//.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({scaleX: 1, scaleY: 1, x: calcScalePositionX}, scaleTime)
 						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
 						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						getTextOrigin.show();
 						// call to function tweenComplete after animation is completed
 					}
-					
-		  			createjs.Tween.get(textDOM, {loop: false})
-					.wait(timeCount-newTimeCount).call(tweenStart)
-					.to({scaleX: scaleX, scaleY: scaleY, x: changeXPosition}, scaleTime)
-					.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
-					.to({scaleX: 1, scaleY: 1, x: calcScalePositionX}, scaleTime)
-					.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
-					.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
-					getTextOrigin.show();
+					else {
+		  				createjs.Tween.get(textDOM, {loop: false})
+						.wait(timeCount-newTimeCount).call(tweenStart)
+						.to({scaleX: scaleX, scaleY: scaleY, x: changeXPosition}, scaleTime)
+						.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
+						.to({scaleX: 1, scaleY: 1, x: calcScalePositionX}, scaleTime)
+						.to({alpha: 0}, 0, createjs.Ease.getPowIn(1))
+						.to({alpha: 1, y: 0, x: 0}).call(tweenComplete);
+						getTextOrigin.show();
+					}
 				}
 				
 				// If there is more than one original-table
@@ -404,9 +410,11 @@ function init() {
 			
 			function removeShapeFromStage(){
 				stage.removeChild(shape);
+				stage.removeChild(image);
 			}
 			function removeShape2FromStage(){
 				stage.removeChild(shape2);
+				stage.removeChild(image);
 			}
 			
 			
