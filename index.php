@@ -9,6 +9,7 @@
 			<link href="css/bootstrap.min.css" rel="stylesheet">
 			<link href="css/starter-template.css" rel="stylesheet">
 			<link href="css/stylesheet.css" rel="stylesheet">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 			
 			<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 			<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -116,6 +117,13 @@
 		</div> <!-- class="col-md-9 -->
 		<div class="col-md-3 menu">
 			<div class="menu-content">
+				<div class="panel panel-default">
+				  <div class="panel-body">
+				    Primary key <i class="fa fa-key" style="color: #FAD60A;"></i>
+					Foreign key <i class="fa fa-key" style="color: orange;"></i>
+				  </div>
+				</div>
+				
 				<h5>Text animation</h5>
 				<div class="radio"> <label> <input type="radio" name="animation" value="normal"> Normal animation </label> </div>
 				<div class="radio"> <label> <input type="radio" name="animation" value="synchronous"> Synchronous animation </label> </div>

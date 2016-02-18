@@ -50,6 +50,13 @@ class tbl{
 					$finalTbResult[] = mysqli_fetch_array($tableResult);
 				}
 				$thisTableName = $tableName[0][$counter];
+				
+				$keyQuery = "SHOW INDEX FROM " . $tableName[0][$counter];
+				$keyResult = mysqli_query($con, $keyQuery);
+				
+				for($j = 0; $j < $keyResult->num_rows; $j++){
+					$finalKeyResult[] = mysqli_fetch_array($keyResult);
+				}
 		?>
 		
 		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
@@ -60,7 +67,33 @@ class tbl{
 					// Table headings:
 					if($show_headings){
 						for($k=1; $k < count($keys); $k+= 2) {
-							echo '<th class="' . $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';	
+							$classNameKey = "";
+							for($h=0; $h < count($finalKeyResult); $h++){
+								if($h > 0){
+									if(($keys[$k] == $finalKeyResult[$h]['Column_name']) && ($finalKeyResult[$h]['Column_name'] != $finalKeyResult[$h-1]['Column_name'])){
+										$classNameKey = "primary_key";
+										if($finalKeyResult[$h]['Non_unique'] > 0){
+											$classNameKey = "foreign_key";
+										}
+									}
+								}
+								else {
+									if($keys[$k] == $finalKeyResult[$h]['Column_name']){
+										$classNameKey = "primary_key";
+										if($finalKeyResult[$h]['Non_unique'] > 0){
+											$classNameKey = "foreign_key";
+										}
+									}
+								}
+								
+							}
+							if($classNameKey != ""){
+								echo '<th class="'. $classNameKey .' '. $keys[$k] . '"><p><i class="fa fa-key"></i>' . $keys[$k] . '</p></th>';
+							}
+							else {
+								echo '<th class="'. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+							}
+							
 						} 
 					}  
 					unset($keys);
@@ -80,6 +113,8 @@ class tbl{
 		</table> 
 		<?php
 			}else{ //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
+				
+				
 				for($i = 0; $i < $step; $i++){
 					if($i < count($tableName[0])){
 						$query = "SELECT * FROM " . $tableName[0][$i];
@@ -90,6 +125,14 @@ class tbl{
 							$finalTbResult[] = mysqli_fetch_array($tableResult);
 						}
 						$thisTableName = $tableName[0][$i];
+						
+						$keyQuery = "SHOW INDEX FROM " . $tableName[0][$i];
+						$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+						$keyResult = mysqli_query($con, $keyQuery);
+				
+						for($j = 0; $j < $keyResult->num_rows; $j++){
+							$finalKeyResult[] = mysqli_fetch_array($keyResult);
+						}
 				?>
 				
 				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
@@ -100,7 +143,30 @@ class tbl{
 							// Table headings:
 							if($show_headings){
 								for($k=1; $k < count($keys); $k+= 2) {
-									echo '<th class="' . $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';	
+									$classNameKey = "";
+									for($h=0; $h < count($finalKeyResult); $h++){
+										if($h > 0){
+											if(($keys[$k] == $finalKeyResult[$h]['Column_name']) && ($finalKeyResult[$h]['Column_name'] != $finalKeyResult[$h-1]['Column_name'])){
+												$classNameKey = "primary_key";
+												if($finalKeyResult[$h]['Non_unique'] > 0){
+													$classNameKey = "foreign_key";
+												}
+											}
+										}else {
+											if($keys[$k] == $finalKeyResult[$h]['Column_name']){
+												$classNameKey = "primary_key";
+												if($finalKeyResult[$h]['Non_unique'] > 0){
+													$classNameKey = "foreign_key";
+												}
+											}
+										}
+									}
+									if($classNameKey != ""){
+										echo '<th class="'. $classNameKey .' '. $keys[$k] . '"><p><i class="fa fa-key"></i>' . $keys[$k] . '</p></th>';
+									}
+									else {
+										echo '<th class="'. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+									}
 								} 
 							}  
 							unset($keys);

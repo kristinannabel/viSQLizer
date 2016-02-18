@@ -40,10 +40,10 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 	}
 	
 	// The previous column's name in empty-table
-	var prevEmptyTableColumn = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").parent().parent().children().first().find("th").eq(columnIndexEmpty-1).html();
+	var prevEmptyTableColumn = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").parent().parent().children().first().find("th").eq(columnIndexEmpty-1).text();
 	// The previous column's name in original-table
-	var prevOriginalTableColumn = thisGetTextOrigin.first().parent().parent().parent().children().first().find("th").eq(columnIndexOriginal-1).html();
-	
+	var prevOriginalTableColumn = thisGetTextOrigin.first().parent().parent().parent().children().first().find("th").eq(columnIndexOriginal-1).text();
+	debugger;
 	// If this element is duplicate in original table
 	if(duplData > 1){
 				while(isRightElem == false){
@@ -85,6 +85,10 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 function init() {
 	// Do not run if no table is present in DOM
 	if($(".streammode-panel").length != 0){
+		
+		$(".original-table").find("th.foreign_key").find("i").css("color", "orange");
+		$(".original-table").find("th.primary_key").find("i").css("color", "#FAD60A");
+		
 		$lastElemIsDone = false;
 		// Initial settings for the canvas
     	var stage = new createjs.Stage("demoCanvas");
@@ -193,8 +197,12 @@ function init() {
 				
 				if(localStorage['bigtext'] == "true"){
 					var animThisIndex = $("#animThis:not(.used)").parent().index();
+					debugger;
+					if(animThisIndex > 0){
+						var prevElementXPos = $("#animThis:not(.used)").parent().prev().find("span").first().position().left;
+					}
 					var prevElementWidth = $("#animThis:not(.used)").parent().prev().find("span").first().width();
-					if((animThisIndex > 0) && (prevElementWidth*2 >= orgPosXElem)){
+					if((animThisIndex > 0) && ((prevElementXPos + (prevElementWidth*2)) >= orgPosXElem)){
 						var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
 					}
 					else {
@@ -218,8 +226,6 @@ function init() {
 						}
 					}
 					if(dragOut == "true"){
-						
-						
 		  				createjs.Tween.get(textDOM, {loop: false})
 						.wait(timeCount-newTimeCount).call(tweenStart)
 						.to({scaleX: scaleX, scaleY: scaleY, x: changeXPosition}, scaleTime)
@@ -281,6 +287,9 @@ function init() {
 					emptyTextPlace.css("visibility", "visible"); //Check quick away and back
 					$(this.htmlElement).removeClass("whiteBrick");
 					$(this.htmlElement).css("z-index", 1);
+					if(i == (tableRows-1)){
+						$(".original-table").find("td:not(.usedBlue)").css("text-decoration","line-through").css("color","grey");
+					}
 				}
 				
 				/**
@@ -289,7 +298,6 @@ function init() {
 				 */
 				function tweenStart(){
 					if($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").length > 0){
-						debugger;
 						$(this.htmlElement).html($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").html());
 					}
 					$(this.htmlElement).addClass("whiteBrick").css("z-index", $zIndexNum);
