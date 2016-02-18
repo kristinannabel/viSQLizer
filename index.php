@@ -59,7 +59,7 @@
 							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
 							<span class="input-group-btn">
 								<button class="btn btn-default decompose" type="submit">Decompose</button>
-								<button class="btn btn-default" id="save_button"><span class="glyphicon glyphicon-floppy-disk"></span></button>
+								<!--<button class="btn btn-default" id="save_button"><span class="glyphicon glyphicon-floppy-disk"></span></button>-->
 							</span>	
 					</div>
 				</form>
