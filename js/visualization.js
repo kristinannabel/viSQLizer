@@ -43,7 +43,6 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 	var prevEmptyTableColumn = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").parent().parent().children().first().find("th").eq(columnIndexEmpty-1).text();
 	// The previous column's name in original-table
 	var prevOriginalTableColumn = thisGetTextOrigin.first().parent().parent().parent().children().first().find("th").eq(columnIndexOriginal-1).text();
-	debugger;
 	// If this element is duplicate in original table
 	if(duplData > 1){
 				while(isRightElem == false){
@@ -90,9 +89,12 @@ function init() {
 		$(".original-table").find("th.primary_key").find("i").css("color", "#FAD60A");
 		
 		$lastElemIsDone = false;
+		$arrowThisDone = false;
+		$isLast = false;
 		// Initial settings for the canvas
     	var stage = new createjs.Stage("demoCanvas");
 		var canvas = document.getElementById("demoCanvas");
+		ctx = canvas.getContext('2d');
 		var table = document.getElementById("main-panel streammode-panel");
 		var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
 		// Set canvas size to size of all tables in SQL view
@@ -127,6 +129,7 @@ function init() {
 		for(var i = 0; i < tableRows; i++) (function(i){
 			// Loop through each column on this (i) row in empty table
 			for(var j = 0; j < tableColumns; j++) (function(j){
+				
 				// Set rowCount. +2 because it should start at 1 and because the first row does not contain data
 				var rowCount = i + 2;
 				// Set columnCount. +1 because it should start at 1
@@ -163,7 +166,7 @@ function init() {
 				
 				// The element to be shown in original table when animation begins. The current element to be animated get id animThis in this function
 				var getTextOrigin = checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount);
-						
+				
 				// Y position of the element in the original table
 				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
 				var orgPosXElem = $(".original-table").find("span#animThis").first().position().left;
@@ -197,7 +200,6 @@ function init() {
 				
 				if(localStorage['bigtext'] == "true"){
 					var animThisIndex = $("#animThis:not(.used)").parent().index();
-					debugger;
 					if(animThisIndex > 0){
 						var prevElementXPos = $("#animThis:not(.used)").parent().prev().find("span").first().position().left;
 					}
@@ -288,7 +290,7 @@ function init() {
 					$(this.htmlElement).removeClass("whiteBrick");
 					$(this.htmlElement).css("z-index", 1);
 					if(i == (tableRows-1)){
-						$(".original-table").find("td:not(.usedBlue)").css("text-decoration","line-through").css("color","grey");
+						$(".original-table").find("td:not(.usedBlue)").addClass("greyNotUsed");
 					}
 				}
 				
@@ -325,9 +327,9 @@ function init() {
 			var bar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
 			stage.addChild(shape);
 			
-		    var image = new createjs.Bitmap("arrow.png");
-			image.alpha = 0;
-		    stage.addChild(image);
+			var arrowz = new createjs.Shape();
+			stage.addChild(arrowz);
+			
 			createjs.Ticker.addEventListener("tick", tick);
 
 			run();
@@ -338,11 +340,11 @@ function init() {
 					if (i === 0) {
 						motionPath.push(points[i].x, points[i].y);
 					}
-					else if(i === 1){
-				    	motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+					else if (i === 1){
+				    		motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 					} else {
-				    	i++;
-						motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+				    		i++;
+							motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 					}
 				}
 
@@ -356,7 +358,7 @@ function init() {
 		 			new createjs.Point(posXStart, middlePosY),
 		  			new createjs.Point(arrowStartPosX, arrowEndPosY)
 			    ];
-
+				
 				if(localStorage['bigtext'] == "false"){
 			    	createjs.Tween.get(bar).wait(timeCount).to({
 			        	guide: {path: getMotionPathFromPoints(points)}
@@ -367,42 +369,76 @@ function init() {
 			        	guide: {path: getMotionPathFromPoints(points)}
 			    	}, 2100).call(lastArrowAnimateComplete);
 				}
-				
-				var startImgPosY = arrowStartPosY + 23;
-				var startImgPosX = arrowStartPosX - 20;
-				var middleImgPosY = middlePosY - 20;
-				var middleImgPosX = arrowStartPosX + 140;
-				var endImgPosY = arrowEndPosY - 33;
-				var endImgPosX = arrowStartPosX + 20;
-				
-				if(localStorage['bigtext'] == "false"){
-					createjs.Tween.get(image).to({rotation: -70}, 0)
-					.wait(timeCount).to({alpha: 1}, 0)
-					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1500)
-					.to({alpha: 0}, 3000);
-				}
-				else {
-					createjs.Tween.get(image).to({rotation: -70}, 0)
-					.wait(timeCount-600).to({alpha: 1}, 0)
-					.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},2100)
-					.to({alpha: 0}, 3500);
-				}
 			}
+			
+			
+
+			function drawFilledPolygon(shape, arrowzShape) {
+					arrowzShape.graphics
+					.clear()
+					.beginFill("#000000")
+						.moveTo(shape[0][0],shape[0][1]);
+						for(p in shape){
+							if(p > 0){
+								arrowzShape.graphics.lineTo(shape[p][0],shape[p][1]);
+							}
+						}
+			    	 arrowzShape.graphics.lineTo(shape[0][0],shape[0][1])
+					 .endStroke();
+				
+			};
+
+			function translateShape(shape,x,y) {
+			    var rv = [];
+			    for(p in shape)
+			        rv.push([ shape[p][0] + x, shape[p][1] + y ]);
+			    return rv;
+			};
+
+			function rotateShape(shape,ang) {
+			    var rv = [];
+			    for(p in shape)
+			        rv.push(rotatePoint(ang,shape[p][0],shape[p][1]));
+			    return rv;
+			};
+			function rotatePoint(ang,x,y) {
+			    return [
+			        (x * Math.cos(ang)) - (y * Math.sin(ang)),
+			        (x * Math.sin(ang)) + (y * Math.cos(ang))
+			    ];
+			};
+
+			var arrow = [
+			    [ 2, 0 ],
+			    [ -10, -4 ],
+			    [ -10, 4]
+			];
 
 			function tick() {
 				if(!$lastElemIsDone){
+					
+					
 			    	shape.graphics
 			        .setStrokeStyle(2, 'round', 'round')
 			        .beginStroke("#000000")
 			        .curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
 			        .endStroke();
-				
+				    var ang = Math.atan2(bar.y-bar.oldy,bar.x-bar.oldx);
+					if(bar.y.toFixed(1) != arrowEndPosY.toFixed(1) && bar.x.toFixed(1) != arrowStartPosX.toFixed(1) && bar.oldx.toFixed(1) != arrowStartPosX.toFixed(1) && bar.oldy.toFixed(1) != arrowEndPosY.toFixed(1)){
+				    	drawFilledPolygon(translateShape(rotateShape(arrow,ang), bar.x, bar.y), arrowz);
+						
+					}
+					
 					if(typeof shape2 !== 'undefined'){
 						shape2.graphics
 			       	 	.setStrokeStyle(2, 'round', 'round')
 			       		.beginStroke("#000000")
 			        	.curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
 			       		.endStroke();
+					    var ang = Math.atan2(bahar.y-bahar.oldy,bahar.x-bahar.oldx);
+						if(bahar.y.toFixed(1) != (originalPosY + (17/2) + 2).toFixed(1) && bahar.x.toFixed(1) != arrowStartPosX.toFixed(1) && bahar.oldx.toFixed(1) != arrowStartPosX.toFixed(1) && bahar.oldy.toFixed(1) != (originalPosY + (17/2) + 2).toFixed(1)){
+					    	drawFilledPolygon(translateShape(rotateShape(arrow,ang), bahar.x, bahar.y), arrowz2);
+						}
 					
 				   	 	bahar.oldx = bahar.x;
 				  	 	bahar.oldy = bahar.y;	
@@ -413,24 +449,29 @@ function init() {
 				
 			    	bar.oldx = bar.x;
 			    	bar.oldy = bar.y;
+					if($arrowThisDone){
+						$arrowThisDone = false;
+					}
 				}
 			}
 			
 			function removeShapeFromStage(){
 				stage.removeChild(shape);
-				stage.removeChild(image);
+				stage.removeChild(arrowz);
 			}
 			function removeShape2FromStage(){
 				stage.removeChild(shape2);
-				stage.removeChild(image);
+				stage.removeChild(arrowz2);
 			}
 			
-			
 			function lastArrowAnimateComplete(){
+				$arrowThisDone = true;
 				if(localStorage['bigtext'] == "false"){
 					createjs.Tween.get(shape).to({alpha: 0}, 3000).call(removeShapeFromStage);
+					createjs.Tween.get(arrowz).to({alpha: 0}, 3000);
 					if(numberOfTables === 2){ 
 						createjs.Tween.get(shape2).to({alpha: 0}, 3000).call(removeShape2FromStage);
+						createjs.Tween.get(arrowz2).to({alpha: 0}, 3000);
 					}
 					if(i == (tableRows-1)){
 						$lastElemIsDone = true;
@@ -439,8 +480,10 @@ function init() {
 				}
 				else {
 					createjs.Tween.get(shape).to({alpha: 0}, 3500).call(removeShapeFromStage);
+					createjs.Tween.get(arrowz).to({alpha: 0}, 3000);
 					if(numberOfTables === 2){ 
 						createjs.Tween.get(shape2).to({alpha: 0}, 3500).call(removeShape2FromStage);
+						createjs.Tween.get(arrowz2).to({alpha: 0}, 3000);
 					}
 					if(i == (tableRows-1)){
 						$lastElemIsDone = true;
@@ -459,10 +502,9 @@ function init() {
 				var shape2 = new createjs.Shape();
 				var bahar = { x: arrowStartPosX, y: arrowStartPosY, oldx: arrowStartPosX, oldy: arrowStartPosY };
 				stage.addChild(shape2);
-			
-			    var image = new createjs.Bitmap("arrow.png");
-				image.alpha = 0;
-			    stage.addChild(image);
+				
+				var arrowz2 = new createjs.Shape();
+				stage.addChild(arrowz2);
 				
 				//createjs.Ticker.addEventListener("tick", tick);
 				function getMotionPathFromPoints2 (points) {
@@ -470,9 +512,7 @@ function init() {
 					for (i = 0, motionPath = []; i < points.length - 1; ++i) {
 						if (i === 0) {
 							motionPath.push(points[i].x, points[i].y);
-						} /*else {
-							motionPath.push(points[i - 1].x, points[i - 1].y, points[i].x, points[i].y);
-						}*/
+						}
 						else if(i === 1){
 					    	motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 						} else {
@@ -501,26 +541,6 @@ function init() {
 				    	createjs.Tween.get(bahar).wait(timeCount-400).to({
 				        	guide: {path: getMotionPathFromPoints2(points)}
 				    	}, 1900).call(lastArrowAnimateComplete);
-					}
-				
-					var startImgPosY = arrowStartPosY + 23;
-					var startImgPosX = arrowStartPosX - 20;
-					var middleImgPosY = middlePosY - 20;
-					var middleImgPosX = arrowStartPosX + 140;
-					var endImgPosY = arrowEndPosY - 33;
-					var endImgPosX = arrowStartPosX + 20;
-				
-					if(localStorage['bigtext'] == "false"){
-						createjs.Tween.get(image).to({rotation: -70}, 0)
-						.wait(timeCount).to({alpha: 1}, 0)
-						.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1500)
-						.to({alpha: 0}, 3000);
-					}
-					else {
-						createjs.Tween.get(image).to({rotation: -70}, 0)
-						.wait(timeCount-400).to({alpha: 1}, 0)
-						.to({rotation: -290, guide:{ path:[startImgPosX, startImgPosY, middleImgPosX, middleImgPosY, endImgPosX, endImgPosY], orient: "auto"}},1900)
-						.to({alpha: 0}, 3800);
 					}
 				}
 				

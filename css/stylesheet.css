@@ -49,3 +49,7 @@
 	background-color: white;
 	height: 20px;
 }
+.greyNotUsed {
+	text-decoration: line-through !important;
+	color: grey;
+}
