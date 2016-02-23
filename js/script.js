@@ -108,9 +108,37 @@ $( document ).ready(function() {
 			thisTextOriginal.parent().css("background-color", "#fcf8c3");
 		}
 		
+		if($(".alert-info-decomposer").find("b:contains(ON)").length > 0){
+			debugger;
+			var numOfOns = $(".original-table").find(".onColumn").length;
+			var thisIndex = $(this).index();
+			var isOnColumn = false;
+			for(var e = 0; e < numOfOns; e++){
+				if($(".original-table").find(".onColumn").eq(e).text() === $(this).parent().parent().find("tr").first().find("th").eq(thisIndex).text()){
+					isOnColumn = true;
+				}
+			}
+			
+			for(var e = 0; e < numOfOns; e++){
+				var onIndex = $(".original-table").find(".onColumn").eq(e).index();
+				var onName = $(".original-table").find(".onColumn").eq(e).text();
+				var thisIndex = $(this).index();
+				if($(this).parent().parent().find("tr").first().find("th").eq(thisIndex).text() == onName){ //Would not work with AS
+					$(this).css("background-color", "#fcf8c3"); //mørk farge ved rad: #fcd1a1
+				}
+				else if(isOnColumn){
+					var otherOnIndex = $(this).parent().parent().find("tr").first().find("th."+ onName).index();
+					if(otherOnIndex >= 0){
+						$(this).parent().find("td").eq(otherOnIndex).css("background-color", "#fcf8c3");
+					}
+				}
+			}
+		}
+		
 		
 	}).live("mouseout", function() {
 		$(this).removeAttr('style');
+		$(this).parent().find("td").removeAttr('style');
    		var columnIndexEmpty = $(this).index();
    	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
    		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"").index();

@@ -311,13 +311,12 @@ function init() {
 					else {
 						$(this.htmlElement.parentElement).addClass("usedBlue");
 					}
-					debugger;
+					
 					if($(".alert-info-decomposer").find("b:contains(ON)").length > 0){
-						debugger;
 						var numOfOns = $(".original-table").find(".onColumn").length;
 						for(var e = 0; e < numOfOns; e++){
 							var onIndex = $(".original-table").find(".onColumn").eq(e).index();
-							if($(this.htmlElement.parentElement).index() == onIndex){
+							if($(this.htmlElement.parentElement).index() == onIndex){//check on name of column as well for error prevention
 								$(this.htmlElement.parentElement).addClass("usedOn");
 							}
 						}
