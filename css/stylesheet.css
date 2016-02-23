@@ -43,13 +43,15 @@
 	z-index: 1;
 }
 .usedBlue {
-	background-color: #d9edf7;
+	background-color: #dff0d8;
 }
 .whiteBrick {
 	background-color: white;
 	height: 20px;
 }
-.greyNotUsed {
-	text-decoration: line-through !important;
-	color: grey;
+.usedWhere {
+	background-color: #d9edf7;
+}
+.usedOn {
+	background-color: #d9edf7;
 }

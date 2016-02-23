@@ -13,6 +13,7 @@
 		private $currentStep;
 		private $totalSteps;
 		private $tableNames;
+		private $whereColumns;
 
 
 		public function __construct($sql, $database_connection) {
@@ -26,6 +27,7 @@
 			$this->mode='single';
 			$this->totalSteps=0;
 			$this->tableNames = array();
+			$this->whereColumns = array();
 		}
 		
 		public function parse_sql_query($step=0) {
@@ -59,6 +61,11 @@
 
 			if(isset($this->parser->parsed['WHERE'])){
 				$select=$this->buildSubQuery('WHERE',$this->parser->parsed['WHERE'],$select);
+				for($k = 0; $k < count($select["WHERE"]); $k++){
+					if(array_key_exists( 'no_quotes', $select["WHERE"][$k])){
+						$this->whereColumns[] = $select["WHERE"][$k]["no_quotes"]["parts"][0];
+					}
+				}
 			}
 		
 			// Do the same for the ORDER clause
@@ -286,7 +293,8 @@
 				$finalTbResult[] = mysqli_fetch_array($tableResult);
 			}
 			//print_r($tableResult);
-			
+			//print_r($select["WHERE"][0]["no_quotes"]["parts"][0]);
+			//print_r($this->whereColumns);
 			$numOfSteps = $this->getTotalSteps();
 			echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 			echo "<div class='panel-body'>";
@@ -299,7 +307,7 @@
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName);
+					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->parser->parsed['FROM'][1]['ref_clause']);
 				}
 			}
 			echo "</div>";

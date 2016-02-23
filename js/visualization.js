@@ -84,10 +84,6 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 function init() {
 	// Do not run if no table is present in DOM
 	if($(".streammode-panel").length != 0){
-		
-		$(".original-table").find("th.foreign_key").find("i").css("color", "orange");
-		$(".original-table").find("th.primary_key").find("i").css("color", "#FAD60A");
-		
 		$lastElemIsDone = false;
 		$arrowThisDone = false;
 		$isLast = false;
@@ -97,6 +93,7 @@ function init() {
 		ctx = canvas.getContext('2d');
 		var table = document.getElementById("main-panel streammode-panel");
 		var formDOMElement = new createjs.DOMElement("main-panel streammode-panel");
+		
 		// Set canvas size to size of all tables in SQL view
   		stage.canvas.width = formDOMElement.htmlElement.clientWidth + 2 + 200;
 		stage.canvas.height = formDOMElement.htmlElement.clientHeight + 2;
@@ -289,9 +286,7 @@ function init() {
 					emptyTextPlace.css("visibility", "visible"); //Check quick away and back
 					$(this.htmlElement).removeClass("whiteBrick");
 					$(this.htmlElement).css("z-index", 1);
-					if(i == (tableRows-1)){
-						$(".original-table").find("td:not(.usedBlue)").addClass("greyNotUsed");
-					}
+					$(this.htmlElement.parentElement).removeClass("usedBlue");
 				}
 				
 				/**
@@ -303,7 +298,37 @@ function init() {
 						$(this.htmlElement).html($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").html());
 					}
 					$(this.htmlElement).addClass("whiteBrick").css("z-index", $zIndexNum);
-					$(this.htmlElement.parentElement).addClass("usedBlue");
+					
+					if($(".alert-info-decomposer").find("b:contains(WHERE)").length > 0){
+						var numOfWheres = $(".original-table").find(".where").length;
+						for(var e = 0; e < numOfWheres; e++){
+							var whereIndex = $(".original-table").find(".where").eq(e).index();
+							if($(this.htmlElement.parentElement).index() == whereIndex){
+								$(this.htmlElement.parentElement).addClass("usedWhere");
+							}
+						}
+					}
+					else {
+						$(this.htmlElement.parentElement).addClass("usedBlue");
+					}
+					debugger;
+					if($(".alert-info-decomposer").find("b:contains(ON)").length > 0){
+						debugger;
+						var numOfOns = $(".original-table").find(".onColumn").length;
+						for(var e = 0; e < numOfOns; e++){
+							var onIndex = $(".original-table").find(".onColumn").eq(e).index();
+							if($(this.htmlElement.parentElement).index() == onIndex){
+								$(this.htmlElement.parentElement).addClass("usedOn");
+							}
+						}
+					}
+					else {
+						$(this.htmlElement.parentElement).addClass("usedBlue");
+					}
+					
+					if(!$(this.htmlElement.parentElement).hasClass("usedOn")){
+						$(this.htmlElement.parentElement).addClass("usedBlue");
+					}
 					$zIndexNum = $zIndexNum-1;
 				}
 						

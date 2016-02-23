@@ -11,8 +11,8 @@
 			<link href="css/stylesheet.css" rel="stylesheet">
 			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 			
-			<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-			<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+			<script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+			<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 			<script type="text/javascript" src="js/bootstrap.min.js"></script>
 			<script src="pixi/bin/pixi.js"></script>
 			<script type="text/javascript" src="js/script.js"></script>
@@ -53,7 +53,7 @@
 				  <strong>Oh no!</strong> The query allready excists in the database
 				</div>
 			
-				<form method="post" action="">
+				<form method="post">
 					<div class="input-group">
 						<input type="text" id="sql-query-input" class="form-control" placeholder="Enter a SQL query.."
 							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
@@ -73,7 +73,9 @@
 						
 						<?php	
 					}?>
+					
 					<canvas id="demoCanvas" width="500" height="300" style="z-index: 2; position: relative; pointer-events: none;"></canvas>
+					
 					<?php
 					if (isset($sql) && $sql != "")
 					{
@@ -119,16 +121,13 @@
 			<div class="menu-content">
 				<div class="panel panel-default">
 				  <div class="panel-body">
-				    Primary key <i class="fa fa-key" style="color: #FAD60A;"></i>
-					Foreign key <i class="fa fa-key" style="color: orange;"></i>
+					<h5>Text animation</h5>
+					<div class="radio"> <label> <input type="radio" name="animation" value="normal"> Normal animation </label> </div>
+					<div class="radio"> <label> <input type="radio" name="animation" value="synchronous"> Synchronous animation </label> </div>
+					<div class="checkbox"> <label> <input type="checkbox" name="dragout" value="dragout"> Drag-out animation </label> </div>
+					<div class="checkbox"> <label> <input type="checkbox" name="bigtext" value="bigtext"> Big text animation </label> </div>
 				  </div>
 				</div>
-				
-				<h5>Text animation</h5>
-				<div class="radio"> <label> <input type="radio" name="animation" value="normal"> Normal animation </label> </div>
-				<div class="radio"> <label> <input type="radio" name="animation" value="synchronous"> Synchronous animation </label> </div>
-				<div class="checkbox"> <label> <input type="checkbox" name="dragout" value="dragout"> Drag-out animation </label> </div>
-				<div class="checkbox"> <label> <input type="checkbox" name="bigtext" value="bigtext"> Big text animation </label> </div>
 				<div class="panel panel-info">
 				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> Database tables</h3></div>
 					<?php
