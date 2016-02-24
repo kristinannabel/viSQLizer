@@ -216,7 +216,8 @@ $( document ).ready(function() {
 		var stepnum = parseInt(stepnum);
 		var anum = stepnum;
 		
-		var query = $('#sql-query-input').val();
+		var input = $('#sql-query-input').val();
+		var query = input.replace(/"/g, "'");
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
 			$(".streammode-panel").html($(".streammode-panel", data).html());
 			setActiveStep(anum);
@@ -235,7 +236,8 @@ $( document ).ready(function() {
 		var anum = num;
 		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
-			var query = $('#sql-query-input').val();
+			var input = $('#sql-query-input').val();
+			var query = input.replace(/"/g, "'");
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
 				setActiveStep(anum);
@@ -258,7 +260,8 @@ $( document ).ready(function() {
 		
 		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
-			var query = $('#sql-query-input').val();
+			var input = $('#sql-query-input').val();
+			var query = input.replace(/"/g, "'");
 			$.post("", {"stepnumber": num, "sql-input": query}, function response(data){
 				$(".streammode-panel").html($(".streammode-panel", data).html());
 				setActiveStep(anum);

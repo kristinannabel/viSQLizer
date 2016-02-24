@@ -28,6 +28,7 @@
 			include_once('parser.php');
 			if($_POST){
 				$sql = $_POST["sql-input"];
+				$sql = str_replace('"',"'",$sql);
 			}
 			
 			ini_set('display_errors',1);
@@ -85,6 +86,7 @@
 						
 						if($result) 
 						{
+							$sql = str_replace('"',"'",$sql);
 							$parser = new Parser($sql, $con);
 							$parser->setMode('stream');
 							$parser->parse_sql_query();
@@ -104,7 +106,7 @@
 						{
 							
 							// Remove the database-name from the error:
-							$error = str_replace(DB_DATABASE.".", "", $error)
+							$error = str_replace('DB_DATABASE'.".", "", $error)
 						
 				?>
 							<br><div class="alert alert-danger" role="alert">
