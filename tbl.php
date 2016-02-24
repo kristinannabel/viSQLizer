@@ -3,6 +3,7 @@
 class tbl{
 		
 	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array()) {
+		//print_r($onColumns);
 		if(($tablename == "savedQueries") || ($tablename == "databaseTables")){
 		?>
 
@@ -96,14 +97,17 @@ class tbl{
 									$whereClassName = "where";
 								}
 							}
+							
 							$onClassName = "";
-							for($r = 0; $r < count($onColumns); $r++){
-								if (($pos = strpos($onColumns[$r]['base_expr'], ".")) !== FALSE) { 
-								    $thisOnColumn = substr($onColumns[$r]['base_expr'], $pos+1); 
+							if(!empty($onColumns)){
+							for($r = 0; $r < count($onColumns[0]); $r++){
+								if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
+								    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
 									if($keys[$k] === $thisOnColumn){
 										$onClassName = "onColumn";
 									}
 								}
+							}
 							}
 							
 							if($classNameKey != ""){
@@ -189,13 +193,15 @@ class tbl{
 										}
 									}
 									$onClassName = "";
-									for($r = 0; $r < count($onColumns); $r++){
-										if (($pos = strpos($onColumns[$r]['base_expr'], ".")) !== FALSE) { 
-										    $thisOnColumn = substr($onColumns[$r]['base_expr'], $pos+1); 
+									if(!empty($onColumns)){
+									for($r = 0; $r < count($onColumns[0]); $r++){
+										if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
+										    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
 											if($keys[$k] === $thisOnColumn){
 												$onClassName = "onColumn";
 											}
 										}
+									}
 									}
 									
 									if($classNameKey != ""){
@@ -235,8 +241,8 @@ class tbl{
 			<tr> 
 			
 				<?php
-					$keys = array_keys($result[0]);
 				
+					$keys = array_keys($result[0]);
 					// Table headings:
 					if($show_headings){
 						for($i=1; $i < count($keys); $i+= 2) {
@@ -251,7 +257,13 @@ class tbl{
 						echo '<tr class="data" id="row_'.$thisRow.'">';
 											
 							for($j=0; $j<count($result[$i])/2; $j++) {
-								echo '<td><span class="textOrigin"  >' . $result[$i][$j] . '</span><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';
+								if($j == 0){
+									echo '<td><span class="textOrigin"  >' . $result[$i][$j] . '</span><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span> <span class="glyphicon glyphicon-arrow-right" style="display: none;"></span></td>';
+								}
+								else {
+									echo '<td><span class="textOrigin"  >' . $result[$i][$j] . '</span><span class="span_'.$j.'"  >' . $result[$i][$j] . '</span></td>';
+								}
+								
 							}?>
 						</tr>
 						<?php

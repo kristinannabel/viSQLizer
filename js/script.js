@@ -65,7 +65,8 @@ $( document ).ready(function() {
 	});
 	
 	/* For when user hovers one of the cells in the empty-table */
-	$("#empty-table").find("td").live('mouseover', function(){
+	$("#empty-table td").live('mouseover', function(e){
+		e.stopPropagation();
 		$(this).css("background-color", "#fcf8c3");
 		var columnIndexEmpty = $(this).index();
 	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
@@ -109,7 +110,6 @@ $( document ).ready(function() {
 		}
 		
 		if($(".alert-info-decomposer").find("b:contains(ON)").length > 0){
-			debugger;
 			var numOfOns = $(".original-table").find(".onColumn").length;
 			var thisIndex = $(this).index();
 			var isOnColumn = false;
@@ -134,9 +134,12 @@ $( document ).ready(function() {
 				}
 			}
 		}
+		if($(this).index() == 0){
+			$(this).find(".glyphicon").show();
+		}
 		
 		
-	}).live("mouseout", function() {
+	}).live("mouseleave", function() {
 		$(this).removeAttr('style');
 		$(this).parent().find("td").removeAttr('style');
    		var columnIndexEmpty = $(this).index();
@@ -146,6 +149,7 @@ $( document ).ready(function() {
 		$(".original-table").find("span").removeClass("notInUse");
 		$(".original-table").find("tr").removeAttr('style');
 		$(".original-table").find("td").removeAttr('style');
+		
    		for(var i = 0; i < numberOfColumnsInThisTable; i++){
    			if(i == 0){
    				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).removeAttr('style');
@@ -153,7 +157,27 @@ $( document ).ready(function() {
    				$(".original-table").find("tr").find("."+thisColumn+"").parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).removeAttr('style');
    			}
    		}
+		if(!$markRowisShown){
+			$(this).find(".glyphicon").hide();
+		}
 	});
+	$markRowisShown = false;
+	$("#empty-table tr").live("mouseleave", function() {
+		$(".empty-table").find("tr").removeAttr('style');
+		$markRowisShown = false;
+		$(this).find(".glyphicon").hide();
+	});
+	$(document).on("click", "#empty-table td:has(.glyphicon) ", function() {
+		debugger;
+		if($markRowisShown){
+			$(this).parent().removeAttr('style');
+			$markRowisShown = false;
+		}else{
+			$(this).parent().css("background-color", "#fcf8e3");
+			$markRowisShown = true;
+		}
+	});
+	
 	
 	/** Operations for stream mode **/
 	

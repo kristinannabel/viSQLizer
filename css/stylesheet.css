@@ -55,3 +55,6 @@
 .usedOn {
 	background-color: #d9edf7;
 }
+.pagination>li.active>a {
+	cursor: pointer !important;
+}

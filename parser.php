@@ -14,6 +14,8 @@
 		private $totalSteps;
 		private $tableNames;
 		private $whereColumns;
+		private $onColumns;
+		private $isJOIN;
 
 
 		public function __construct($sql, $database_connection) {
@@ -28,6 +30,8 @@
 			$this->totalSteps=0;
 			$this->tableNames = array();
 			$this->whereColumns = array();
+			$this->onColumns = array();
+			$this->isJOIN = false;
 		}
 		
 		public function parse_sql_query($step=0) {
@@ -55,10 +59,11 @@
 					
 					$source_table = $this->buildSubQuery('FROM', $temp, $source_table);
 				}
+				$this->onColumns[] = $this->parser->parsed['FROM'][1]['ref_clause'];
 			}
 			// Add the full FROM-part
 			$select=$this->buildSubQuery('FROM',$this->parser->parsed['FROM'],$select);
-
+			
 			if(isset($this->parser->parsed['WHERE'])){
 				$select=$this->buildSubQuery('WHERE',$this->parser->parsed['WHERE'],$select);
 				for($k = 0; $k < count($select["WHERE"]); $k++){
@@ -307,7 +312,7 @@
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->parser->parsed['FROM'][1]['ref_clause']);
+					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns);
 				}
 			}
 			echo "</div>";
