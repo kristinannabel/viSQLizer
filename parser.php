@@ -16,6 +16,7 @@
 		private $whereColumns;
 		private $onColumns;
 		private $isJOIN;
+		private $onOrderBy;
 
 
 		public function __construct($sql, $database_connection) {
@@ -32,6 +33,7 @@
 			$this->whereColumns = array();
 			$this->onColumns = array();
 			$this->isJOIN = false;
+			$this->onOrderBy = array();
 		}
 		
 		public function parse_sql_query($step=0) {
@@ -75,6 +77,7 @@
 		
 			// Do the same for the ORDER clause
 			if(isset($this->parser->parsed['ORDER'])){
+				$this->onOrderBy = $this->parser->parsed['ORDER'];
 				$select=$this->buildSubQuery('ORDER',$this->parser->parsed['ORDER'],$select);
 			}
 			// Do the same for the SELECT clause, now making the projection. (remowing the SELECT * FROM-part that was
@@ -274,13 +277,9 @@
 		}
 		//Takes the chosen step after the parser has run and displays the text and tables for the step
 		public function showStep($step) {
-			//echo "<h3><p text-transform: capitalize>Step " . $step . "</p></h3>";
 			foreach($this->singleStepTable[$step] as $output) {
 				if (($output['type']=='text') or ($output['type']=='query')){
 					echo "<br><div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
-					/*echo "<br><table class='table table-striped'>";
-					echo '<td>'.$output['contents'].'</td>';
-					echo "</table>";*/
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
@@ -297,22 +296,17 @@
 			for($i = 0; $i < $tableResult->num_rows; $i++){
 				$finalTbResult[] = mysqli_fetch_array($tableResult);
 			}
-			//print_r($tableResult);
-			//print_r($select["WHERE"][0]["no_quotes"]["parts"][0]);
-			//print_r($this->whereColumns);
 			$numOfSteps = $this->getTotalSteps();
+			
 			echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 			echo "<div class='panel-body'>";
 			foreach($this->singleStepTable[$step] as $output) {
 				if (($output['type']=='text') or ($output['type']=='query')){
 					echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
-					/*echo "<br><table class='table table-striped'>";
-					echo '<td>'.$output['contents'].'</td>';
-					echo "</table>";*/
 				}
 				else if ($output['type']=='table') {
 					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns);
+					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable);
 				}
 			}
 			echo "</div>";

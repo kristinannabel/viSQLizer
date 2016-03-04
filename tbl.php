@@ -2,8 +2,15 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array()) {
-		//print_r($onColumns);
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $prevTable=array()) {
+		if(!empty($prevTable) && $step > 1){
+			foreach($prevTable[$step-1] as $output) {
+				if ($output['type']=='table') {
+					$prevTable = $output['contents'];
+				}
+			}
+		}
+		
 		if(($tablename == "savedQueries") || ($tablename == "databaseTables")){
 		?>
 
@@ -60,7 +67,7 @@ class tbl{
 				for($j = 0; $j < $keyResult->num_rows; $j++){
 					$finalKeyResult[] = mysqli_fetch_array($keyResult);
 				}
-		?>
+		echo "<b>" . $thisTableName . "</b>"; ?>
 		
 		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 			<tbody>
@@ -109,12 +116,20 @@ class tbl{
 								}
 							}
 							}
+							$OrderByClassName = "";
+							if(!empty($onOrderBy)){
+								for($a = 0; $a < count($onOrderBy); $a++){
+									if($keys[$k] === $onOrderBy[$a]["base_expr"]){
+										$OrderByClassName = "orderByColumn";
+									}
+								}
+							}
 							
 							if($classNameKey != ""){
-								echo '<th class="'. $classNameKey . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							else {
-								echo '<th class="'. $whereClassName . ' ' . $onClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							
 						} 
@@ -127,7 +142,7 @@ class tbl{
 				for($m=0; $m < count($finalTbResult); $m++){ ?>
 					<tr id="data"> <?php
 							for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-								echo '<td class="original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+								echo '<td class="original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 							}?>
 					</tr>
 					<?php
@@ -135,10 +150,67 @@ class tbl{
 		</tbody>
 		</table> 
 		<?php
-			}else{ //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
+			}
+			else { //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
+				if(($step > (count($tableName[0])+1)) && (!empty($prevTable))){ ?>
+					<table class='table table-bordered original-table org-db-table'>
+						<tbody>
+						<tr> 
+			
+							<?php
 				
-				
-				for($i = 0; $i < $step; $i++){
+								$keys = array_keys($prevTable[0]);
+								// Table headings:
+								if($show_headings){
+									for($i=1; $i < count($keys); $i+= 2) {
+										$whereClassName = "";
+										for($r = 0; $r < count($whereColumns); $r++){
+											if($keys[$i] == $whereColumns[$r]){
+												$whereClassName = "where";
+											}
+										}
+							
+										$onClassName = "";
+										if(!empty($onColumns)){
+										for($r = 0; $r < count($onColumns[0]); $r++){
+											if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
+											    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+												if($keys[$i] === $thisOnColumn){
+													$onClassName = "onColumn";
+												}
+											}
+										}
+										}
+										$OrderByClassName = "";
+										if(!empty($onOrderBy)){
+											for($a = 0; $a < count($onOrderBy); $a++){
+												if($keys[$i] === $onOrderBy[$a]["base_expr"]){
+													$OrderByClassName = "orderByColumn";
+												}
+											}
+										}
+										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '"><p>' . $keys[$i] . '</p></th>';
+									} 
+								}unset($keys);?>
+						</tr>
+							<?php
+								// Table data:
+								for($i=0; $i < count($prevTable); $i++){ 
+									$thisRow = $i+1; 
+									echo '<tr class="data">';
+											
+										for($j=0; $j<count($prevTable[$i])/2; $j++) {
+											echo '<td class="original-data original-data-'.$j.'"><span id="span_'.$j.'" class="span_'.$j.' extraSpan">' . $prevTable[$i][$j] . '</span><span id="original-span" class="used original-span_'.$j.'">' . $prevTable[$i][$j] . '</span></td>';
+										}?>
+									</tr>
+									<?php
+								} ?>
+						</tbody>
+						</table>
+						<?php
+				}
+				else {
+					for($i = 0; $i < $step; $i++){
 					if($i < count($tableName[0])){
 						$query = "SELECT * FROM " . $tableName[0][$i];
 						$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
@@ -157,7 +229,7 @@ class tbl{
 							$finalKeyResult[] = mysqli_fetch_array($keyResult);
 						}
 						
-				?>
+				echo "<b>" . $thisTableName . "</b>"; ?>
 				
 				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 					<tbody>
@@ -203,12 +275,20 @@ class tbl{
 										}
 									}
 									}
+									$OrderByClassName = "";
+									if(!empty($onOrderBy)){
+										for($a = 0; $a < count($onOrderBy); $a++){
+											if($keys[$k] === $onOrderBy[$a]["base_expr"]){
+												$OrderByClassName = "orderByColumn";
+											}
+										}
+									}
 									
 									if($classNameKey != ""){
-										echo '<th class="'. $classNameKey . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
 									}
 									else {
-										echo '<th class="'. $whereClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
 									}
 								} 
 							}  
@@ -222,21 +302,22 @@ class tbl{
 							
 							<tr id="data">	<?php
 									for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-										echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+										echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
 									}?>
 							</tr>
 							<?php
 						} ?>
 				</tbody>
 				</table>
-				<?php
+					<?php
+						}
+						unset($finalTbResult);
 					}
-					unset($finalTbResult);
 				}
 			}
 		
 		if($empty){?>
-		<table class='table table-bordered empty-table' id='empty-table'>
+		<b>Result table</b><table class='table table-bordered empty-table' id='empty-table'>
 			<tbody>
 			<tr> 
 			

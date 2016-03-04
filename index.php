@@ -37,7 +37,7 @@
 			
 			?>
     </head>
-    <body onload="init();">
+    <body onload="init();"><!---->
         <div class="page-header">
             <h1><a href="/"> viSQLizer</a> <small>  SQL learning tool </small> </h1>
         </div>
@@ -59,7 +59,7 @@
 						<input type="text" id="sql-query-input" class="form-control" placeholder="Enter a SQL query.."
 							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
 							<span class="input-group-btn">
-								<button class="btn btn-default decompose" type="submit">Decompose</button>
+								<button class="btn btn-default decompose" type="submit">Run new query!</button>
 								<!--<button class="btn btn-default" id="save_button"><span class="glyphicon glyphicon-floppy-disk"></span></button>-->
 							</span>	
 					</div>
@@ -121,7 +121,7 @@
 		</div> <!-- class="col-md-9 -->
 		<div class="col-md-3 menu">
 			<div class="menu-content">
-				<div class="panel panel-default">
+				<!--<div class="panel panel-default">
 				  <div class="panel-body">
 					<h5>Text animation</h5>
 					<div class="radio"> <label> <input type="radio" name="animation" value="normal"> Normal animation </label> </div>
@@ -129,7 +129,7 @@
 					<div class="checkbox"> <label> <input type="checkbox" name="dragout" value="dragout"> Drag-out animation </label> </div>
 					<div class="checkbox"> <label> <input type="checkbox" name="bigtext" value="bigtext"> Big text animation </label> </div>
 				  </div>
-				</div>
+				</div>-->
 				<div class="panel panel-info">
 				  <div class="panel-heading"><h3 class="panel-title"><span class="glyphicon glyphicon-th-list"></span> Database tables</h3></div>
 					<?php

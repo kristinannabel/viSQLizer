@@ -4,6 +4,7 @@
 	margin-top: -20px;
 	border-left: 1px solid #eee;
 	border-bottom: 1px solid #eee;
+	z-index: 1;
 }
 .menu-content {
 	margin-right: 12px;
@@ -55,6 +56,11 @@
 .usedOn {
 	background-color: #d9edf7;
 }
+.usedOrderBy {
+	background-color: #d9edf7;
+}
 .pagination>li.active>a {
 	cursor: pointer !important;
+}
+.extraSpan {
 }

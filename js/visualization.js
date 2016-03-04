@@ -77,6 +77,21 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 	}
 }
 
+function setSpanWidth(){
+	for(var a = 0; a < $(".original-table").length; a++){
+		var columnCount = $(".original-table").eq(a).find("tr").first().find("th").length;
+		for(var b = 0; b < columnCount; b++){
+			var columnWidth = $(".original-table").eq(a).find("tr").first().find("th").eq(b).outerWidth();
+			numOfRows = $(".original-table").eq(a).find("tr").length;
+			for(var c = 1; c < numOfRows; c++){
+				if($(".original-table").eq(a).find("tr").eq(c).find("td").eq(b).find(".extraSpan").outerWidth() > columnWidth){
+					$(".original-table").eq(a).find("tr").eq(c).find("td").eq(b).find(".extraSpan").css("width", columnWidth-10);
+				}
+			}
+		}
+	}
+}
+
 /*
  * Initial function for the animation and canvas visualizations
  * Is run onload of DOM body
@@ -84,6 +99,8 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 function init() {
 	// Do not run if no table is present in DOM
 	if($(".streammode-panel").length != 0){
+		//setSpanWidth();
+		
 		$lastElemIsDone = false;
 		$arrowThisDone = false;
 		$isLast = false;
@@ -181,7 +198,7 @@ function init() {
 					var orPosX = $(thisTable).find("span#animThis").position().left;
 				}
 				else {
-					var orPosX = $(".original-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span").position().left;
+					var orPosX = $(".original-table").find("span#animThis").position().left;
 				}
 				
 				// Calculated position Y from the original position and result position
@@ -191,16 +208,14 @@ function init() {
 
 				var thisDOMElem = $("#animThis").get(0);
 				
-				//Create an DOMElement for the canvas
-				var textDOM = new createjs.DOMElement(thisDOMElem);
-				stage.addChild(textDOM);
-				
 				if(localStorage['bigtext'] == "true"){
 					var animThisIndex = $("#animThis:not(.used)").parent().index();
 					if(animThisIndex > 0){
-						var prevElementXPos = $("#animThis:not(.used)").parent().prev().find("span").first().position().left;
+						var prevElementXPos = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().position().left;
 					}
-					var prevElementWidth = $("#animThis:not(.used)").parent().prev().find("span").first().width();
+					var $clone = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().clone().css({width: "auto", display:"none"}).appendTo($("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().parent());
+					var prevElementWidth = $clone.outerWidth();
+					$clone.remove();
 					if((animThisIndex > 0) && ((prevElementXPos + (prevElementWidth*2)) >= orgPosXElem)){
 						var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
 					}
@@ -208,20 +223,30 @@ function init() {
 						var changeXPosition = 0;
 					}
 				}
+				
+				setSpanWidth();
+				//Create an DOMElement for the canvas
+				var textDOM = new createjs.DOMElement(thisDOMElem);
+				stage.addChild(textDOM);
+				
 				animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition );
 				function animateTextFromDOM(bigText, dragOut, changeXPosition){
 					var scaleX = 1;
 					var scaleY = 1;
 					var scaleTime = 0;
 					var newTimeCount = 0;
-					calcScalePositionX = calcPositionX;
+					var calcScalePositionX = calcPositionX;
 					if(bigText == "true"){
 						scaleX = 1.5;
 						scaleY = 1.5;
 						scaleTime = 300;
 						newTimeCount = 600;
 						if(changeXPosition > 0){
+							if((prevElementXPos + prevElementWidth) > orPosX){
+								changeXPosition = prevElementWidth - prevElementXPos + 30;
+							}
 							calcPositionX = changeXPosition;
+							//calcScalePositionX = calcPositionX;
 						}
 					}
 					if(dragOut == "true"){
@@ -280,6 +305,7 @@ function init() {
 				 * Shows the hidden text in empty-table
 				 */
 				function tweenComplete(){
+					setSpanWidth();
 					$(this.htmlElement).html($(this.htmlElement).next().html());
 					
 					var emptyTextPlace = $("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span");
@@ -294,6 +320,7 @@ function init() {
 				 * Sets the background color for the selected row in the original table
 				 */
 				function tweenStart(){
+					$(this.htmlElement).css("width", "auto");
 					if($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").length > 0){
 						$(this.htmlElement).html($("#empty-table").find("tr:nth-child("+rowCount+")").find("td:nth-child("+columnCount+")").find("span:not(.textOrigin):contains('...')").html());
 					}
@@ -324,6 +351,19 @@ function init() {
 					else {
 						$(this.htmlElement.parentElement).addClass("usedBlue");
 					}
+					if($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0){
+						var numOfOrderBy = $(".original-table").find(".orderByColumn").length;	
+						for(var e = 0; e < numOfOrderBy; e++){
+					 		var orderIndex = $(".original-table").find(".orderByColumn").eq(e).index();
+							if($(this.htmlElement.parentElement).index() == orderIndex){//check on name of column as well for error prevention
+								$(this.htmlElement.parentElement).addClass("usedOrderBy");
+							}
+					 	}
+					}
+					else {
+						$(this.htmlElement.parentElement).addClass("usedBlue");
+					}
+					
 					
 					if(!$(this.htmlElement.parentElement).hasClass("usedOn")){
 						$(this.htmlElement.parentElement).addClass("usedBlue");
