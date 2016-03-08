@@ -296,34 +296,46 @@
 			for($i = 0; $i < $tableResult->num_rows; $i++){
 				$finalTbResult[] = mysqli_fetch_array($tableResult);
 			}
-			$numOfSteps = $this->getTotalSteps();
 			
-			echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
-			echo "<div class='panel-body'>";
-			foreach($this->singleStepTable[$step] as $output) {
-				if (($output['type']=='text') or ($output['type']=='query')){
-					echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
-				}
-				else if ($output['type']=='table') {
-					$TBL = new tbl();
-					$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable);
-				}
-			}
-			echo "</div>";
-			if($numOfSteps > 1){
-				echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#'>Previous</a></li>";
-				
-				for($i = 1; $i <= $numOfSteps; $i++){
-					echo "<li class='step step" . $i . "'><a id='astep".$i."' href='#' onclick='stepClicked()'>" . $i . "</a></li>";
-				}
-				
-				echo "<li class='next'><a href='#'>Next</a></li></ul></div></div>";
-			}
-			else {
+			$numOfSteps = $this->getTotalSteps();
+			if(!empty($this->parser->parsed['SELECT'][0]['alias'])){
+				echo "<div class='alert alert-danger' role='alert'>";
+				echo "Alias is not supported by this version of the viSQLizer prototype!";
 				echo "</div>";
 			}
+			if($this->parser->parsed['SELECT'][0]['expr_type']=="aggregate_function"){
+				echo "<div class='alert alert-danger' role='alert'>";
+				echo "Aggregate functions is not supported by this version of the viSQLizer prototype!";
+				echo "</div>";
+			}
+			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
+				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
+				echo "<div class='panel-body'>";
+			print_r($this->parser->parsed['FROM']);
+				foreach($this->singleStepTable[$step] as $output) {
+					if (($output['type']=='text') or ($output['type']=='query')){
+						echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
+					}
+					else if ($output['type']=='table') {
+						$TBL = new tbl();
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable);
+					}
+				}
+				echo "</div>";
+				if($numOfSteps > 1){
+					echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#'>Previous</a></li>";
+					for($i = 1; $i <= $numOfSteps; $i++){
+						echo "<li class='step step" . $i . "'><a id='astep".$i."' href='#' onclick='stepClicked()'>" . $i . "</a></li>";
+					}
+					echo "<li class='next'><a href='#'>Next</a></li></ul></div></div>";
+				}
+				else {
+					echo "</div>";
+				}
+
+			}
+			
 		}
-		
 		
 	} 
 ?>

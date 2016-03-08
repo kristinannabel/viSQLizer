@@ -122,7 +122,6 @@ $( document ).ready(function() {
 	});
 	
 	function setColumnColor(){
-		debugger;
 		if($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0){
 			var numOfOrderBy = $(".original-table").find(".orderByColumn").length;	
 			for(var e = 0; e < numOfOrderBy; e++){

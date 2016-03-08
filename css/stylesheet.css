@@ -25,6 +25,11 @@
 	background-color: #d9edf7;
 	border-color: #bce8f1;
 }
+.alert-warning-decomposer {
+	color: black;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
 
 .page-header a:hover {
 	color: #428bca;

@@ -64,7 +64,7 @@ MODIFY `userid` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 DROP TABLE IF EXISTS `exam`;
 CREATE TABLE `exam` (
   `course_code` varchar(10) NOT NULL,
-  `student_no` int(6) NOT NULL,
+  `student_num` int(6) NOT NULL,
   `year` int(4) NOT NULL,
   `score` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -81,7 +81,7 @@ INSERT INTO `course` (`code`, `name`) VALUES
 
 
 
-INSERT INTO `exam` (`course_code`, `student_no`, `year`, `score`) VALUES
+INSERT INTO `exam` (`course_code`, `student_num`, `year`, `score`) VALUES
 ('IMT4003', 99123, 2014,  2),
 ('IMT4032', 99123, 2013,  3),
 ('IMT4032', 100902, 2013, 4),
@@ -110,5 +110,5 @@ ALTER TABLE `student`
 
 
 ALTER TABLE `exam`
-ADD CONSTRAINT `exam_ibfk_2` FOREIGN KEY (`student_no`) REFERENCES `student` (`student_no`),
+ADD CONSTRAINT `exam_ibfk_2` FOREIGN KEY (`student_num`) REFERENCES `student` (`student_no`),
 ADD CONSTRAINT `exam_ibfk_1` FOREIGN KEY (`course_code`) REFERENCES `course` (`code`) ON DELETE NO ACTION;

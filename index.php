@@ -37,7 +37,7 @@
 			
 			?>
     </head>
-    <body onload="init();"><!---->
+    <body  onload="init();"><!---->
         <div class="page-header">
             <h1><a href="/"> viSQLizer</a> <small>  SQL learning tool </small> </h1>
         </div>
@@ -75,7 +75,7 @@
 						<?php	
 					}?>
 					
-					<canvas id="demoCanvas" width="500" height="300" style="z-index: 2; position: relative; pointer-events: none;"></canvas>
+					<canvas id="demoCanvas" width="0" height="0" style="z-index: 2; position: relative; pointer-events: none;"></canvas>
 					
 					<?php
 					if (isset($sql) && $sql != "")
@@ -106,7 +106,7 @@
 						{
 							
 							// Remove the database-name from the error:
-							$error = str_replace('DB_DATABASE'.".", "", $error)
+							$error = str_replace(DECOMPOSE_DATABASE.".", "", $error)
 						
 				?>
 							<br><div class="alert alert-danger" role="alert">

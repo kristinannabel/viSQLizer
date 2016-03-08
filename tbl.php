@@ -316,13 +316,16 @@ class tbl{
 				}
 			}
 		
-		if($empty){?>
+		if($empty){
+			if(empty($result)){
+				echo "<div class='alert alert-warning-decomposer' role='alert'>This query returned no results!</div>";
+			}
+			else { ?>
 		<b>Result table</b><table class='table table-bordered empty-table' id='empty-table'>
 			<tbody>
 			<tr> 
 			
 				<?php
-				
 					$keys = array_keys($result[0]);
 					// Table headings:
 					if($show_headings){
@@ -351,7 +354,7 @@ class tbl{
 					} ?>
 			</tbody>
 			</table>
-		<?php	
+		<?php }	
 		}
 	}
 	}
