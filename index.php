@@ -37,7 +37,7 @@
 			
 			?>
     </head>
-    <body  onload="init();"><!---->
+    <body onload="init();"><!---->
         <div class="page-header">
             <h1><a href="/"> viSQLizer</a> <small>  SQL learning tool </small> </h1>
         </div>

@@ -311,7 +311,6 @@
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 				echo "<div class='panel-body'>";
-			print_r($this->parser->parsed['FROM']);
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
 						echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";

@@ -50,7 +50,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 		var prevOriginalTableColumn = thisGetTextOrigin.first().parent().parent().parent().children().first().find("th").eq(columnIndexOriginal - 1).text();
 		var thisOriginalIndex = thisGetTextOrigin.first().parent().index();
 		var thisEmptyIndex = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").index();
-		if (thisGetTextOrigin.first().parent().is(':first-child')) {
+		if (thisGetTextOrigin.first().parent().is(':first-child') && thisGetTextOrigin.first().parent().parent().parent().has(".usedInRow").length == 0 ) {
 			// If this is the first element in this row
 			isRightElem = true;
 			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
@@ -101,7 +101,6 @@ function setSpanWidth() {
 function init() {
 	// Do not run if no table is present in DOM
 	if ($(".streammode-panel").length != 0) {
-		debugger;
 
 		$lastElemIsDone = false;
 		$arrowThisDone = false;
@@ -153,35 +152,32 @@ function init() {
 
 				// Getting the text of this data element in empty-table
 				var textContent = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span.textOrigin").html();
-
+				
 				// Getting how many elements in this row (in empty-table) is equal to the text of this data-element
-				var numOfThisElem = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("span.textOrigin:contains('" + textContent + "')").length;
+				var numOfThisElem = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("span.textOrigin").filter(function() {
+    				return $(this).text() === textContent;
+				}).length;
 				// How many of these elements is not used jet
-				var numOfThisElemNotUsed = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("span.textOrigin:not(.used):contains('" + textContent + "')").length;
+				var numOfThisElemNotUsed = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("span.textOrigin:not(.used)").filter(function() {
+    				return $(this).text() === textContent;
+				}).length;
 				// The index for the element
 				var elemNumInRow = numOfThisElem - numOfThisElemNotUsed;
 				// Add class used to this element, so it is not used again
-				$("#empty-table").find("tr:nth-child(" + rowCount + ")").find("span.textOrigin:contains('" + textContent + "')").eq(elemNumInRow).addClass("used");
+				$("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span.textOrigin:contains('" + textContent + "')").addClass("used");
 
-
-				if (elemNumInRow > 0) {
-					// A similar element has been used before in this row, so do not get the ones marked duplicate or used
-					var thisGetTextOrigin = $(".original-table").find("span:not(.used):not(.duplicate)").filter(function() {
-						return $(this).html() === textContent;
-					});
-				} else {
-					// This is the first or only similar element in this row, do not get a used element
-					var thisGetTextOrigin = $(".original-table").find("span:not(.used)").filter(function() {
-						return $(this).html() === textContent;
-					});
-				}
+				var thisGetTextOrigin = $(".original-table").find("span:not(.used)").filter(function() {
+					return $(this).html() === textContent;
+				});
 
 				var thisTable = thisGetTextOrigin.first().parent().parent().parent().parent();
 				var duplData = $(thisTable).find("span:not(.used):contains('" + textContent + "')").length;
 				// The element to be shown in original table when animation begins. The current element to be animated get id animThis in this function
 				var getTextOrigin = checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount);
+				debugger;
 				// Y position of the element in the original table
 				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
+				// X position of the lement in the original table
 				var orgPosXElem = $(".original-table").find("span#animThis").first().position().left;
 				var originalPosX = $(".streammode-panel").width();
 				// Y position of the element in the empty-table
@@ -247,7 +243,7 @@ function init() {
 							if ((prevElementXPos + prevElementWidth) > orPosX) {
 								changeXPosition = prevElementWidth - prevElementXPos + 30;
 							}
-							calcPositionX = changeXPosition;
+							calcPositionX = calcPositionX + changeXPosition;
 							//calcScalePositionX = calcPositionX;
 						}
 					}
@@ -320,7 +316,9 @@ function init() {
 				if (numberOfTables > 1) {
 					var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
 					var thisTableId = "#" + thisTableIdTemp;
-					var countOfDuplicates = $(thisTableId).find("span:not(#original-span):contains('" + textContent + "')").length;
+					var countOfDuplicates = $(thisTableId).find("span:not(#original-span)").filter(function() {
+    					return $(this).text() === textContent;
+					}).length;
 
 					// If there is duplicates of this element in this table
 					if ((countOfDuplicates > 1) && ($(".empty-table").find("tr").length <= $(thisTableId).find("tr").length)) {
@@ -331,11 +329,58 @@ function init() {
 						$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 						//}
 					} else {
-						var duplicatesInAllTables = $(".original-table").find("span:not(.used):contains('" + textContent + "')").length;
+						var duplicatesInAllTables = $(".original-table").find("span:not(.used)").filter(function() {
+    						return $(this).text() === textContent;
+						}).length;
 						// If there is duplicates of this element in both original-tables together
 						if (duplicatesInAllTables > countOfDuplicates) {
 							//This is a duplicate, mark as one
-							$(".original-table").find("span#animThis").first().addClass("duplicate");
+							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
+							var thisRowCount = $(thisTable).find("tr#data").length;
+							var numOfReps = tableRows/thisRowCount;
+							if (($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) {
+								//If Cartesian product
+								if(typeof $(".original-table").find("span#animThis").first().attr("value") === 'undefined'){
+									$(".original-table").find("span#animThis").first().attr("value", "0")
+								}
+								var numUsed = parseInt($(".original-table").find("span#animThis").first().attr("value"));
+								if(numUsed < numOfReps){
+									if(duplicatesInAllTables - countOfDuplicates > countOfDuplicates){
+										$(".original-table").find("span#animThis").first().addClass("duplicate");
+									}
+									numUsed = numUsed+1;
+									$(".original-table").find("span#animThis").first().attr("value", numUsed);
+									if(numUsed == numOfReps){
+										$(".original-table").find("span#animThis").first().addClass("used");
+									}
+								}
+								else {
+									$(".original-table").find("span#animThis").first().addClass("used");
+								}
+							}
+							else {
+								$(".original-table").find("span#animThis").first().addClass("duplicate");
+							}
+						}
+						else if (($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) {
+							//If Cartesian product
+							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
+							var thisRowCount = $(thisTable).find("tr#data").length;
+							var numOfReps = tableRows/thisRowCount;
+							if(typeof $(".original-table").find("span#animThis").first().attr("value") === 'undefined'){
+								$(".original-table").find("span#animThis").first().attr("value", "0")
+							}
+							var numUsed = parseInt($(".original-table").find("span#animThis").first().attr("value"));
+							if(numUsed < numOfReps){
+								numUsed = numUsed+1;
+								$(".original-table").find("span#animThis").first().attr("value", numUsed);
+								if(numUsed == numOfReps){
+									$(".original-table").find("span#animThis").first().addClass("used");
+								}
+							}
+							else {
+								$(".original-table").find("span#animThis").first().addClass("used");
+							}
 						}
 						// remove id animThis from element
 						$(".original-table").find("span#animThis").first().removeAttr("id").parent().addClass("usedInRow").addClass("usedInRow_" + i);

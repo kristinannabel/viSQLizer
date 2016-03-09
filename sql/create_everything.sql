@@ -103,7 +103,7 @@ ALTER TABLE `course`
  ADD PRIMARY KEY (`code`);
 
 ALTER TABLE `exam`
- ADD KEY `course_code` (`course_code`), ADD KEY `student_no` (`student_no`);
+ ADD PRIMARY KEY (`course_code`), ADD PRIMARY KEY (`student_num`);
 
 ALTER TABLE `student`
  ADD PRIMARY KEY (`student_no`);
