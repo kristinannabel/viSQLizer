@@ -28,6 +28,74 @@ function setViewToEmptyTable(thCount) {
 
 function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount) {
 	var isRightElem = false;
+	debugger;
+	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)) && (thisGetTextOrigin.length > 1)) {
+		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
+		var countNumOfEquals = 0;
+		while(countNumOfEquals != numberOfColumns){
+			countNumOfEquals = 0;
+			for(var h=0; h < numberOfColumns; h++){
+				var thisEmptyText = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td").eq(h).find("span.textOrigin").html();
+				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").eq(h).find("span.extraSpan").html();
+				if(thisEmptyText === thisOrgText){
+					countNumOfEquals++;
+				}
+			}
+			if(countNumOfEquals != numberOfColumns){
+				thisGetTextOrigin.first().addClass("notInUse");
+				var thisGetTextOrigin = $(".original-table").find("span.extraSpan:not(.notInUse)").filter(function() {
+					return $(this).html() === textContent;
+				});
+			}
+		}
+	}
+	else if($(".alert-info-decomposer:contains(*)").length == 0){
+		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
+		var countNumOfEquals = 0;
+		while(countNumOfEquals != numberOfColumns){
+			countNumOfEquals = 0;
+			for(var h=0; h < numberOfColumns; h++){
+				var thisEmptyText = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td").eq(h).find("span.textOrigin").html();
+				var thisEmptyColumnName = $("#empty-table").find("tr").first().find("th").eq(h).text();
+				var thisEmptyIdName = $("#empty-table").find("tr").first().find("th").eq(h).attr("id");
+				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+					return $(this).html() === thisEmptyText;
+				});
+				var jumpOut = false;
+				while(!jumpOut){
+					if(thisOrgText.length == 0){
+						jumpOut = true;
+						thisOrgText.first().addClass("notInUse");
+						var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+							return $(this).html() === thisEmptyText;
+						});
+					}
+					else {
+						var thisOrgIndex = thisOrgText.parent().index();
+						var thisOrgColumnHead = thisOrgText.parent().parent().parent().find("tr").first().find("th").eq(thisOrgIndex);
+						if(thisOrgColumnHead.hasClass(thisEmptyColumnName) && thisOrgColumnHead.attr("id") == thisEmptyIdName){
+							//right element
+							countNumOfEquals++;
+							jumpOut = true;
+						}
+						else{
+							//get next element
+							thisOrgText.first().addClass("notInUse");
+							var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+								return $(this).html() === thisEmptyText;
+							});
+						}
+					}
+				}
+			}
+			if(countNumOfEquals != numberOfColumns){
+				thisGetTextOrigin.first().addClass("notInUse");
+				var thisGetTextOrigin = $(".original-table").find("span.extraSpan:not(.used):not(.notInUse)").filter(function() {
+					return $(this).html() === textContent;
+				});
+			}
+		}
+	}
 
 	// Column index of this element
 	var columnIndexOriginal = thisGetTextOrigin.first().parent().index();
@@ -50,15 +118,18 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 		var prevOriginalTableColumn = thisGetTextOrigin.first().parent().parent().parent().children().first().find("th").eq(columnIndexOriginal - 1).text();
 		var thisOriginalIndex = thisGetTextOrigin.first().parent().index();
 		var thisEmptyIndex = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").index();
-		if (thisGetTextOrigin.first().parent().is(':first-child') && thisGetTextOrigin.first().parent().parent().parent().has(".usedInRow").length == 0 ) {
+		
+		var thisEmptyId = $("#empty-table").find("tr").first().find("th").eq(thisEmptyIndex).attr("id");
+		var thisOriginalId = thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).attr("id");
+		if (((thisGetTextOrigin.first().parent().is(':first-child')) && (thisGetTextOrigin.first().parent().parent().parent().has(".usedInRow").length == 0) && (thisEmptyId == thisOriginalId)) || ((thisEmptyId == thisOriginalId) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").has(".usedInRow").length == 0) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).text() === $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().find("th").eq(thisEmptyIndex).text()))) {
 			// If this is the first element in this row
 			isRightElem = true;
 			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
-		} else if ((thisGetTextOrigin.first().parent().parent().has(".usedInRow").length != 0) && (!thisGetTextOrigin.first().parent().hasClass("usedInRow"))) {
+		} else if ((thisGetTextOrigin.first().parent().parent().has(".usedInRow").length != 0) && (!thisGetTextOrigin.first().parent().hasClass("usedInRow")) && (thisEmptyId == thisOriginalId)) {
 			// If this has siblings with class usedInRow, siblings that have been used already on this row
 			isRightElem = true;
 			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
-		} else if ((!thisGetTextOrigin.first().parent().siblings().find("span:not(#original-span)").hasClass("used")) && ((isNotFirstColumn) && (prevEmptyTableColumn != prevOriginalTableColumn) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).text() === $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().find("th").eq(thisEmptyIndex).text()))) {
+		} else if ((!thisGetTextOrigin.first().parent().siblings().find("span:not(#original-span)").hasClass("used")) && ((isNotFirstColumn) && (thisEmptyId == thisOriginalId) && (prevEmptyTableColumn != prevOriginalTableColumn) && (!thisGetTextOrigin.first().parent().parent().parent().find("tr").has(".usedInRow").find("td").eq(thisOriginalIndex).hasClass("usedInRow")) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).text() === $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().find("th").eq(thisEmptyIndex).text()))) {
 			// If this element is first to be used in row even if it is not first element
 			// This test does not work if AS is set on column names in query
 			isRightElem = true;
@@ -101,7 +172,6 @@ function setSpanWidth() {
 function init() {
 	// Do not run if no table is present in DOM
 	if ($(".streammode-panel").length != 0) {
-
 		$lastElemIsDone = false;
 		$arrowThisDone = false;
 		$isLast = false;
@@ -174,7 +244,6 @@ function init() {
 				var duplData = $(thisTable).find("span:not(.used):contains('" + textContent + "')").length;
 				// The element to be shown in original table when animation begins. The current element to be animated get id animThis in this function
 				var getTextOrigin = checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount);
-				debugger;
 				// Y position of the element in the original table
 				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
 				// X position of the lement in the original table
@@ -203,7 +272,7 @@ function init() {
 				var thisDOMElem = $("#animThis").get(0);
 				if (localStorage['bigtext'] == "true") {
 					var animThisIndex = $("#animThis:not(.used)").parent().index();
-					if (animThisIndex > 0) {
+					/*if (animThisIndex > 0) {
 						if ($("#animThis:not(.used)").parent().parent().find(".usedInRow").length > 0) {
 							var prevElementXPos = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().position().left;
 							var $clone = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().clone().css({
@@ -213,12 +282,22 @@ function init() {
 							var prevElementWidth = $clone.outerWidth();
 							$clone.remove();
 						}
-					}
-					if ((animThisIndex > 0) && ((prevElementXPos + (prevElementWidth * 2)) >= orgPosXElem)) {
-						var changeXPosition = (prevElementWidth * 1.5) - prevElementWidth;
+					}*/
+					if ((animThisIndex > 0) && ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX))) {
+						var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
 					} else {
 						var changeXPosition = 0;
 					}
+					$prevCalcPositionX = calcPositionX;
+					$prevOrgPosXElem = orgPosXElem;
+					$prevChangeXPosition = changeXPosition;
+					var $clone2 = $("#animThis").first().clone().css({
+						width: "auto",
+						display: "none"
+					}).appendTo($("#animThis").parent());
+					$prevOrgWidth = $clone2.outerWidth();
+					$clone2.remove();
+					
 				}
 
 				setSpanWidth();
@@ -240,8 +319,8 @@ function init() {
 						scaleTime = 300;
 						newTimeCount = 600;
 						if (changeXPosition > 0) {
-							if ((prevElementXPos + prevElementWidth) > orPosX) {
-								changeXPosition = prevElementWidth - prevElementXPos + 30;
+							if ((($prevOrgPosXElem + $prevOrgWidth) > orPosX) && ($prevOrgPosXElem < orPosX)) {
+								changeXPosition = $prevOrgWidth - $prevOrgPosXElem + 30;
 							}
 							calcPositionX = calcPositionX + changeXPosition;
 							//calcScalePositionX = calcPositionX;
@@ -740,6 +819,7 @@ function init() {
 			if (localStorage['animation'] == "normal") {
 				timeCount += 2200;
 			}
+			debugger;
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 			$(".original-table").find(".notInUse").removeClass("notInUse");

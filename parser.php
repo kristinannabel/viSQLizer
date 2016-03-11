@@ -65,7 +65,6 @@
 			}
 			// Add the full FROM-part
 			$select=$this->buildSubQuery('FROM',$this->parser->parsed['FROM'],$select);
-			
 			if(isset($this->parser->parsed['WHERE'])){
 				$select=$this->buildSubQuery('WHERE',$this->parser->parsed['WHERE'],$select);
 				for($k = 0; $k < count($select["WHERE"]); $k++){
@@ -271,9 +270,9 @@
 			$this->singleStepTable[$this->currentStep][$i+1]['type']=$type;
 			$this->singleStepTable[$this->currentStep][$i+1]['contents']=$contents;
 		}
-		public function displayResult($step=0) {
+		public function displayResult($step=0, $sql) {
 			$this->compareQueries();
-			$this->showStep2($step);
+			$this->showStep2($step, $sql);
 		}
 		//Takes the chosen step after the parser has run and displays the text and tables for the step
 		public function showStep($step) {
@@ -288,7 +287,7 @@
 			}
 		}
 		// Displays the text and tabled for the step inside a wizard
-		public function showStep2($step) {
+		public function showStep2($step, $sql) {
 			$tableName[] = $this->getListOfTables();
 			$query = "SELECT * FROM " . $tableName[0][0];
 			$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
@@ -311,13 +310,14 @@
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 				echo "<div class='panel-body'>";
+				print_r($this->parser->parsed);
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
 						echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
 					}
 					else if ($output['type']=='table') {
 						$TBL = new tbl();
-						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable);
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable, $sql);
 					}
 				}
 				echo "</div>";

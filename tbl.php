@@ -2,9 +2,9 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $prevTable=array()) {
-		if(!empty($prevTable) && $step > 1){
-			foreach($prevTable[$step-1] as $output) {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $previousTable=array(), $sql="") {
+		if(!empty($previousTable) && $step > 1){
+			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
 					$prevTable = $output['contents'];
 				}
@@ -67,7 +67,8 @@ class tbl{
 				for($j = 0; $j < $keyResult->num_rows; $j++){
 					$finalKeyResult[] = mysqli_fetch_array($keyResult);
 				}
-		echo "<b>" . $thisTableName . "</b>"; ?>
+				mysqli_close($con);
+		echo "<b>" . $thisTableName . "</b>";?>
 		
 		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 			<tbody>
@@ -75,9 +76,19 @@ class tbl{
 	
 				<?php
 					$keys = array_keys($finalTbResult[0]);
+					$var = (string)$previousTable[$step][1]['contents'];
+					$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
+					$tempString = str_replace($removeWords, "", $var);
+					//$tempQuery = strstr($tempString, 'FROM');
+					$tempQuery = $tempString . " LIMIT 1";
+					mysqli_report(MYSQLI_REPORT_ERROR);
+					$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+					$tempResult = mysqli_query($con, $tempQuery);
+					mysqli_close($con);
 					// Table headings:
 					if($show_headings){
-						for($k=1; $k < count($keys); $k+= 2) {
+						for($k=1, $c=0; $k < count($keys); $k+= 2, $c++) {
+							$finfo = mysqli_fetch_field_direct($tempResult, $c);
 							$classNameKey = "";
 							for($h=0; $h < count($finalKeyResult); $h++){
 								if($h > 0){
@@ -124,17 +135,17 @@ class tbl{
 									}
 								}
 							}
-							
 							if($classNameKey != ""){
-								echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							else {
-								echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							
 						} 
 					}  
 					unset($keys);
+					mysqli_free_result($tempResult);
 					?>
 			</tr>
 			<?php
@@ -160,38 +171,62 @@ class tbl{
 							<?php
 				
 								$keys = array_keys($prevTable[0]);
+								$var = (string)$previousTable[$step][1]['contents'];
+								$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
+								$tempString = str_replace($removeWords, "", $var);
+								$tempQuery = strstr($tempString, 'FROM');
+								$tempQuery = "SELECT * " . $tempQuery . " LIMIT 1";
+								$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+								$tempResult = mysqli_query($con, $tempQuery);
+								mysqli_close($con);
 								// Table headings:
 								if($show_headings){
-									for($i=1; $i < count($keys); $i+= 2) {
-										$whereClassName = "";
-										for($r = 0; $r < count($whereColumns); $r++){
-											if($keys[$i] == $whereColumns[$r]){
-												$whereClassName = "where";
-											}
+									for($i=1, $c=0; $i <= count($keys); $i+= 2, $c++) {
+										if($i == count($keys) && !isset($keys[$i])){
+											$finfo = mysqli_fetch_field_direct($tempResult, $c);
+											echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+											//Add classnames here as well later
 										}
+										else if(is_int($keys[$i])){
+											$finfo = mysqli_fetch_field_direct($tempResult, $keys[$i]-1);
+											echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+											//Add classnames here as well later
+										}
+										else {
+											$finfo = mysqli_fetch_field_direct($tempResult, $c);
+											
+											$whereClassName = "";
+											for($r = 0; $r < count($whereColumns); $r++){
+												if($keys[$i] == $whereColumns[$r]){
+													$whereClassName = "where";
+												}
+											}
 							
-										$onClassName = "";
-										if(!empty($onColumns)){
-										for($r = 0; $r < count($onColumns[0]); $r++){
-											if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
-											    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
-												if($keys[$i] === $thisOnColumn){
-													$onClassName = "onColumn";
+											$onClassName = "";
+											if(!empty($onColumns)){
+												for($r = 0; $r < count($onColumns[0]); $r++){
+													if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+														if($keys[$i] === $thisOnColumn){
+															$onClassName = "onColumn";
+														}
+													}
 												}
 											}
-										}
-										}
-										$OrderByClassName = "";
-										if(!empty($onOrderBy)){
-											for($a = 0; $a < count($onOrderBy); $a++){
-												if($keys[$i] === $onOrderBy[$a]["base_expr"]){
-													$OrderByClassName = "orderByColumn";
+											$OrderByClassName = "";
+											if(!empty($onOrderBy)){
+												for($a = 0; $a < count($onOrderBy); $a++){
+													if($keys[$i] === $onOrderBy[$a]["base_expr"]){
+														$OrderByClassName = "orderByColumn";
+													}
 												}
 											}
+											echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . '</p></th>';
 										}
-										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '"><p>' . $keys[$i] . '</p></th>';
 									} 
-								}unset($keys);?>
+								}unset($keys);
+								mysqli_free_result($tempResult);
+								?>
 						</tr>
 							<?php
 								// Table data:
@@ -220,7 +255,7 @@ class tbl{
 							$finalTbResult[] = mysqli_fetch_array($tableResult);
 						}
 						$thisTableName = $tableName[0][$i];
-						
+						mysqli_close($con);
 						$keyQuery = "SHOW INDEX FROM " . $tableName[0][$i];
 						$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 						$keyResult = mysqli_query($con, $keyQuery);
@@ -228,7 +263,7 @@ class tbl{
 						for($j = 0; $j < $keyResult->num_rows; $j++){
 							$finalKeyResult[] = mysqli_fetch_array($keyResult);
 						}
-						
+						mysqli_close($con);
 				echo "<b>" . $thisTableName . "</b>"; ?>
 				
 				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
@@ -237,9 +272,13 @@ class tbl{
 			
 						<?php
 							$keys = array_keys($finalTbResult[0]);
+							$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+							$tempResult = mysqli_query($con, $query);
+							mysqli_close($con);
 							// Table headings:
 							if($show_headings){
-								for($k=1; $k < count($keys); $k+= 2) {
+								for($k=1, $c=0; $k < count($keys); $k+= 2, $c++) {
+									$finfo = mysqli_fetch_field_direct($tempResult, $c);
 									$classNameKey = "";
 									for($h=0; $h < count($finalKeyResult); $h++){
 										if($h > 0){
@@ -285,14 +324,15 @@ class tbl{
 									}
 									
 									if($classNameKey != ""){
-										echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 									}
 									else {
-										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 									}
 								} 
 							}  
 							unset($keys);
+							mysqli_free_result($tempResult);
 							?>
 					</tr>
 					<?php
@@ -312,6 +352,8 @@ class tbl{
 					<?php
 						}
 						unset($finalTbResult);
+						unset($tableResult);
+						unset($keyResult);
 					}
 				}
 			}
@@ -327,12 +369,38 @@ class tbl{
 			
 				<?php
 					$keys = array_keys($result[0]);
+					$var = (string)$previousTable[$step][1]['contents'];
+					$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
+					$tempString = str_replace($removeWords, "", $var);
+					//$tempQuery = strstr($tempString, 'FROM');
+					$tempQuery = $tempString . " LIMIT 1";
+					mysqli_report(MYSQLI_REPORT_ERROR);
+					$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+					$tempResult = mysqli_query($con, $tempQuery);
+					mysqli_close($con);
 					// Table headings:
 					if($show_headings){
-						for($i=1; $i < count($keys); $i+= 2) {
-							echo '<th class="' . $keys[$i] . '"><p>' . $keys[$i] . '</p></th>';	
+						for($i=1, $c=0; $i <= count($keys); $i+= 2, $c++) {
+							if($i == count($keys) && !isset($keys[$i])){
+								$finfo = mysqli_fetch_field_direct($tempResult, $c);
+								echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+								//printf($finfo->name);
+							}
+							else if(is_int ($keys[$i])){
+								$finfo = mysqli_fetch_field_direct($tempResult, $keys[$i]-1);
+								echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+							}
+							else {
+								$finfo = mysqli_fetch_field_direct($tempResult, $c);
+								echo '<th class="' . $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . '</p></th>';	
+							}
 						} 
-					}?>
+					}
+					unset($keys);
+					//unset($finfo);
+					mysqli_free_result($tempResult);
+					//mysqli_close($con);
+					?>
 			</tr>
 				<?php
 					// Table data:

@@ -95,10 +95,10 @@
 							<br>
 							<?php
 							if(!isset($_POST["stepnumber"])){
-								$parser->displayResult(1);
+								$parser->displayResult(1, $sql);
 							}
 							else {
-								$parser->displayResult($_POST["stepnumber"]);
+								$parser->displayResult($_POST["stepnumber"], $sql);
 							}
 							
 						} 
