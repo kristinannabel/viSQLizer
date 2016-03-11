@@ -160,7 +160,7 @@ $( document ).ready(function() {
 	});
 	
 	function setColumnColor(){
-		if($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0){
+		if(($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)){
 			var numOfOrderBy = $(".original-table").find(".orderByColumn").length;	
 			for(var e = 0; e < numOfOrderBy; e++){
 		 		$(".original-table").find(".orderByColumn").addClass("usedOrderBy");

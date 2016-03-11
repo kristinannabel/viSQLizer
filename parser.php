@@ -17,6 +17,7 @@
 		private $onColumns;
 		private $isJOIN;
 		private $onOrderBy;
+		private $onGroupBy;
 
 
 		public function __construct($sql, $database_connection) {
@@ -34,6 +35,7 @@
 			$this->onColumns = array();
 			$this->isJOIN = false;
 			$this->onOrderBy = array();
+			$this->onGroupBy = array();
 		}
 		
 		public function parse_sql_query($step=0) {
@@ -87,6 +89,7 @@
 				$this->decomposeSelect($select);
 			}
 			if (isset($this->parser->parsed['GROUP'])) {
+				$this->onGroupBy = $this->parser->parsed['GROUP'];
 				$this->decomposeGroupBy($select);
 				$select=$this->buildSubQuery('GROUP',$this->parser->parsed['GROUP'],$select);
 			}
@@ -310,14 +313,13 @@
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
 				echo "<div class='panel-body'>";
-				print_r($this->parser->parsed);
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
 						echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
 					}
 					else if ($output['type']=='table') {
 						$TBL = new tbl();
-						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->singleStepTable, $sql);
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql);
 					}
 				}
 				echo "</div>";

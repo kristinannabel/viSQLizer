@@ -28,7 +28,6 @@ function setViewToEmptyTable(thCount) {
 
 function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount) {
 	var isRightElem = false;
-	debugger;
 	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)) && (thisGetTextOrigin.length > 1)) {
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		var countNumOfEquals = 0;
@@ -524,7 +523,7 @@ function init() {
 					} else {
 						$(this.htmlElement.parentElement).addClass("usedBlue");
 					}
-					if ($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) {
+					if (($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)) {
 						var numOfOrderBy = $(".original-table").find(".orderByColumn").length;
 						for (var e = 0; e < numOfOrderBy; e++) {
 							var orderIndex = $(".original-table").find(".orderByColumn").eq(e).index();
@@ -819,7 +818,6 @@ function init() {
 			if (localStorage['animation'] == "normal") {
 				timeCount += 2200;
 			}
-			debugger;
 			// Remove the class usedInRow, before starting on a new row
 			$(".original-table").find(".usedInRow").removeClass("usedInRow");
 			$(".original-table").find(".notInUse").removeClass("notInUse");

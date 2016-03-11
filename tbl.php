@@ -2,7 +2,7 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $previousTable=array(), $sql="") {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="") {
 		if(!empty($previousTable) && $step > 1){
 			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
@@ -135,11 +135,20 @@ class tbl{
 									}
 								}
 							}
+							$GroupByClassName = "";
+							if(!empty($onGroupBy)){
+								for($a = 0; $a < count($onGroupBy); $a++){
+									if($keys[$k] === $onGroupBy[$a]["base_expr"]){
+										$GroupByClassName = "orderByColumn";
+									}
+								}
+							}
+							
 							if($classNameKey != ""){
-								echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $classNameKey . ' '. $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							else {
-								echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
+								echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 							}
 							
 						} 
@@ -221,7 +230,15 @@ class tbl{
 													}
 												}
 											}
-											echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . '</p></th>';
+											$GroupByClassName = "";
+											if(!empty($onGroupBy)){
+												for($a = 0; $a < count($onGroupBy); $a++){
+													if($keys[$i] === $onGroupBy[$a]["base_expr"]){
+														$GroupByClassName = "orderByColumn";
+													}
+												}
+											}
+											echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . '</p></th>';
 										}
 									} 
 								}unset($keys);
@@ -322,12 +339,20 @@ class tbl{
 											}
 										}
 									}
+									$GroupByClassName = "";
+									if(!empty($onGroupBy)){
+										for($a = 0; $a < count($onGroupBy); $a++){
+											if($keys[$k] === $onGroupBy[$a]["base_expr"]){
+												$GroupByClassName = "orderByColumn";
+											}
+										}
+									}
 									
 									if($classNameKey != ""){
-										echo '<th class="'. $classNameKey . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $classNameKey . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' . $whereClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 									}
 									else {
-										echo '<th class="'. $whereClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
+										echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' ' .  $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
 									}
 								} 
 							}  
