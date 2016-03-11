@@ -9,7 +9,7 @@ This project is based on the SQL Decomposer, and is a master thesis project at N
 ### How do I get set up? ###
 * Make sure your server is running PHP and MySQL (and MYSQLi).
 * Download the source code.
-* Download the [config-file](https://bitbucket.org/gtl-hig/sql-decomposer/downloads/config.php) and move it to the destination of the source code files.
+* Download the config-file and move it to the destination of the source code files.
 * Change the config-file to match your database-settings. If you are contributing trough GIT -> ignore the config-file.
 * Run the SQL-scripts create_everything.sql and create_testuser.sql in your database.
 
