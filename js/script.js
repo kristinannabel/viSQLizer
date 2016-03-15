@@ -213,10 +213,10 @@ $( document ).ready(function() {
 	
 	$(document).on("click", ".wizard-footer .step a", function(e) {
 		e.preventDefault();
-		var stepnum = $(this).html();//get clicked step
-		var stepnum = parseInt(stepnum);
-		var anum = stepnum;
-		
+		debugger;
+		var stepnum = $(this).attr("class");//get clicked step
+		stepnum = parseInt(stepnum);
+		var anum = parseInt($(this).html());
 		var input = $('#sql-query-input').val();
 		var query = input.replace(/"/g, "'");
 		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
@@ -231,12 +231,12 @@ $( document ).ready(function() {
 	
 	$(document).on("click", ".wizard-footer .next a", function(e) {
 		e.preventDefault();
-		var stepnum = $(".wizard-footer").find(".active").find("a").html(); //get active step
+		var stepnum = $(".wizard-footer").find(".active").find("a").attr("class"); //get active step
 
 		var num = parseInt(stepnum);
 		num = num + 1; // get number of next step
-		var anum = num;
-		var thisstep = ".step" + anum;
+		var anum = parseInt($(".wizard-footer").find(".active").find("a").html()) + 1;
+		var thisstep = ".step" + num;
 		if($(".wizard-footer").find(thisstep).length){
 			var input = $('#sql-query-input').val();
 			var query = input.replace(/"/g, "'");
@@ -256,12 +256,12 @@ $( document ).ready(function() {
 	
 	$(document).on("click", ".wizard-footer .previous a", function(e) {
 		e.preventDefault();
-		var stepnum = $(".wizard-footer").find(".active").find("a").html(); //get active step
+		var stepnum = $(".wizard-footer").find(".active").find("a").attr("class"); //get active step
 		var num = parseInt(stepnum);
 		num = num - 1; // get number of previous step
-		var anum = num;
+		var anum = parseInt($(".wizard-footer").find(".active").find("a").html()) - 1;
 		
-		var thisstep = ".step" + anum;
+		var thisstep = ".step" + num;
 		if($(".wizard-footer").find(thisstep).length){
 			var input = $('#sql-query-input').val();
 			var query = input.replace(/"/g, "'");

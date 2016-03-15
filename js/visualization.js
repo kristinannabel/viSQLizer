@@ -416,7 +416,8 @@ function init() {
 							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
 							var thisRowCount = $(thisTable).find("tr#data").length;
 							var numOfReps = tableRows/thisRowCount;
-							if (($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) {
+							
+							if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
 								//If Cartesian product
 								if(typeof $(".original-table").find("span#animThis").first().attr("value") === 'undefined'){
 									$(".original-table").find("span#animThis").first().attr("value", "0")
@@ -440,7 +441,7 @@ function init() {
 								$(".original-table").find("span#animThis").first().addClass("duplicate");
 							}
 						}
-						else if (($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) {
+						else if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
 							//If Cartesian product
 							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
 							var thisRowCount = $(thisTable).find("tr#data").length;

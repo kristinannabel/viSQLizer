@@ -292,6 +292,23 @@
 		// Displays the text and tabled for the step inside a wizard
 		public function showStep2($step, $sql) {
 			$tableName[] = $this->getListOfTables();
+			$numOfSteps = $this->getTotalSteps();
+			$thisStep = $step;
+			if($numOfSteps > 1){
+				$thisNumStep = $numOfSteps - count($tableName[0]);
+			}
+			else {
+				$thisNumStep = $numOfSteps;
+			}
+			
+			if($step <= count($tableName[0]) && $numOfSteps > 1){
+				$step = count($tableName[0])+1;
+				$thisStep = 1;
+			}
+			else if($step > count($tableName[0])){
+				$thisStep = $step - count($tableName[0]);
+			}
+			
 			$query = "SELECT * FROM " . $tableName[0][0];
 			$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 			$tableResult = mysqli_query($con, $query);
@@ -299,7 +316,6 @@
 				$finalTbResult[] = mysqli_fetch_array($tableResult);
 			}
 			
-			$numOfSteps = $this->getTotalSteps();
 			if(!empty($this->parser->parsed['SELECT'][0]['alias'])){
 				echo "<div class='alert alert-danger' role='alert'>";
 				echo "Alias is not supported by this version of the viSQLizer prototype!";
@@ -311,7 +327,7 @@
 				echo "</div>";
 			}
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
-				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $step . " of " . $numOfSteps . "</h3></div>";
+				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
 				echo "<div class='panel-body'>";
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
@@ -319,14 +335,18 @@
 					}
 					else if ($output['type']=='table') {
 						$TBL = new tbl();
-						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql);
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql, $this->parser->parsed);
 					}
 				}
 				echo "</div>";
 				if($numOfSteps > 1){
 					echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#'>Previous</a></li>";
+					$stepCounter = 1;
 					for($i = 1; $i <= $numOfSteps; $i++){
-						echo "<li class='step step" . $i . "'><a id='astep".$i."' href='#' onclick='stepClicked()'>" . $i . "</a></li>";
+						if($i > count($tableName[0])){
+							echo "<li class='step step" . $stepCounter . "'><a id='astep".$stepCounter."' href='#' onclick='stepClicked()' class='" . $i . "'>" . $stepCounter . "</a></li>";
+							$stepCounter++;
+						}
 					}
 					echo "<li class='next'><a href='#'>Next</a></li></ul></div></div>";
 				}

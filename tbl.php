@@ -2,12 +2,18 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="") {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array()) {
 		if(!empty($previousTable) && $step > 1){
 			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
 					$prevTable = $output['contents'];
 				}
+			}
+		}
+		$crossClassName = "";
+		if(!empty($joinType['FROM'][1]['join_type'])){
+			if($joinType['FROM'][1]['join_type'] === "CROSS"){
+				$crossClassName = "cross";
 			}
 		}
 		
@@ -68,9 +74,10 @@ class tbl{
 					$finalKeyResult[] = mysqli_fetch_array($keyResult);
 				}
 				mysqli_close($con);
+				
 		echo "<b>" . $thisTableName . "</b>";?>
 		
-		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
+		<table class='table table-bordered original-table org-db-table <?php echo $thisTableName;?> <?echo $crossClassName;?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 			<tbody>
 			<tr> 
 	
@@ -173,7 +180,7 @@ class tbl{
 			}
 			else { //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
 				if(($step > (count($tableName[0])+1)) && (!empty($prevTable))){ ?>
-					<table class='table table-bordered original-table org-db-table'>
+					<table class='table table-bordered original-table org-db-table <?echo $crossClassName;?>'>
 						<tbody>
 						<tr> 
 			
@@ -283,7 +290,7 @@ class tbl{
 						mysqli_close($con);
 				echo "<b>" . $thisTableName . "</b>"; ?>
 				
-				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
+				<table class='table table-bordered original-table <?php echo $thisTableName; ?> <?echo $crossClassName;?> <?php echo $tablename; ?>' id='<?php echo $thisTableName; ?>'>
 					<tbody>
 					<tr> 
 			
