@@ -303,12 +303,12 @@
 			
 			if($step <= count($tableName[0]) && $numOfSteps > 1){
 				$step = count($tableName[0])+1;
+				
 				$thisStep = 1;
 			}
 			else if($step > count($tableName[0])){
 				$thisStep = $step - count($tableName[0]);
 			}
-			
 			$query = "SELECT * FROM " . $tableName[0][0];
 			$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 			$tableResult = mysqli_query($con, $query);
@@ -328,6 +328,7 @@
 			}
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
+				
 				echo "<div class='panel-body'>";
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){

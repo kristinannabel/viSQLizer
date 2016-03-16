@@ -3,21 +3,24 @@ $( document ).ready(function() {
 	localStorage['animation'] = "normal";
 	localStorage['dragout'] = true;
 	localStorage['bigtext'] = true;
+	$markRowisShown = false;
 		
 	/* For when user hovers one of the cells in the empty-table */
 	$("#empty-table td").live('mouseover', function(e){
 		e.stopPropagation();
+		// Sets color to this element
 		$(this).css("background-color", "#fcf8c3");
 		var columnIndexEmpty = $(this).index();
 		var thisColumnId = $(this).parent().parent().find("tr").first().find("th").eq(columnIndexEmpty).attr("id");
 	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
 		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).index();
 		var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").length;
+		// Sets color to all elements in selected column
 		for(var i = 0; i < numberOfColumnsInThisTable; i++){
 			if(i == 0){
-				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).css("background-color", "#fcf8e3");
+				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).css("background-color", "#fcf8e3").addClass("columnColorSet");
 			} else {
-				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).css("background-color", "#fcf8e3");
+				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).css("background-color", "#fcf8e3").addClass("columnColorSet");
 			}
 		}
 		var thisText = $(this).find("span").first().html();
@@ -53,7 +56,8 @@ $( document ).ready(function() {
 				thisRow = thisRow - 1;
 				if(thisTextOriginal.first().parent().parent().find("td[class*='usedInRow_" + thisRow + "']").length != 0){
 					thisTextOriginal.first().parent().parent().children("td").css("background-color", "#fcf8e3");
-					thisTextOriginal.first().parent().css("background-color", "#fcf8c3");
+					// Sets color to this elements original cell
+					thisTextOriginal.first().parent().css("background-color", "#fcf8c3").addClass("thisElementColorSet");
 					foundCorrectCell = true;
 				}
 				else {
@@ -84,7 +88,8 @@ $( document ).ready(function() {
 		}
 		else{
 			thisTextOriginal.parent().parent().children("td").css("background-color", "#fcf8e3")
-			thisTextOriginal.parent().css("background-color", "#fcf8c3");
+			// Sets color to this elements original cell
+			thisTextOriginal.parent().css("background-color", "#fcf8c3").addClass("thisElementColorSet");
 		}
 		
 		if($(".alert-info-decomposer").find("b:contains(ON)").length > 0){
@@ -101,13 +106,16 @@ $( document ).ready(function() {
 				var onIndex = $(".original-table").find(".onColumn").eq(e).index();
 				var onName = $(".original-table").find(".onColumn").eq(e).text();
 				var thisIndex = $(this).index();
+				if($markRowisShown){
+					debugger;
+				}
 				if($(this).parent().parent().find("tr").first().find("th").eq(thisIndex).text() == onName){ //Would not work with AS
-					$(this).css("background-color", "#fcf8c3"); //mørk farge ved rad: #fcd1a1
+					$(this).css("background-color", "#fcf8c3").addClass("onColumnColor"); //mørk farge ved rad: #fcd1a1
 				}
 				else if(isOnColumn){
 					var otherOnIndex = $(this).parent().parent().find("tr").first().find("th."+ onName).index();
 					if(otherOnIndex >= 0){
-						$(this).parent().find("td").eq(otherOnIndex).css("background-color", "#fcf8c3");
+						$(this).parent().find("td").eq(otherOnIndex).css("background-color", "#fcf8c3").addClass("onColumnColor");
 					}
 				}
 			}
@@ -118,48 +126,67 @@ $( document ).ready(function() {
 		
 		
 	}).live("mouseleave", function() {
-		$(this).removeAttr('style');
-		$(this).parent().find("td").removeAttr('style');
-   		var columnIndexEmpty = $(this).index();
-		var thisColumnId = $(this).parent().parent().find("tr").first().find("th").eq(columnIndexEmpty).attr("id");
-   	    var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
-   		var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).index();
-   		var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").length;
-		$(".original-table").find("span").removeClass("notInUse");
-		$(".original-table").find("tr").removeAttr('style');
-		$(".original-table").find("td").removeAttr('style');
+		if($markRowisShown){
+			$(".original-table").find(".columnColorSet").removeAttr('style');
+			$(this).removeAttr('style').css("background-color", "#fcf8e3");
+			$(this).parent().find("td").removeAttr('style').css("background-color", "#fcf8e3");
+			$(".original-table").find(".thisElementColorSet").css("background-color", "#fcf8e3");
+			$(".original-table").find(".thisElementColorSet").removeClass("thisElementColorSet");
+			$(".original-table").find(".columnColorSet").removeClass("columnColorSet");
+			$(".original-table").find("span").removeClass("notInUse");
+		}
+		else {
+			$(".original-table").find(".thisElementColorSet").removeClass("thisElementColorSet");
+			$(".original-table").find(".columnColorSet").removeClass("columnColorSet");
+			$(".empty-table").find(".onColumnColor").removeClass("onColumnColor");
+			$(this).removeAttr('style');
+			$(this).parent().find("td").removeAttr('style');
+   			var columnIndexEmpty = $(this).index();
+			var thisColumnId = $(this).parent().parent().find("tr").first().find("th").eq(columnIndexEmpty).attr("id");
+   	   		var thisColumn = $( this ).parent().parent().children().first().find("th").eq(columnIndexEmpty).find("p").html();
+   			var originalColumnIndex = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).index();
+   			var numberOfColumnsInThisTable = $(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").length;
+			$(".original-table").find("span").removeClass("notInUse");
+			$(".original-table").find("tr").removeAttr('style');
+			$(".original-table").find("td").removeAttr('style');
 		
-   		for(var i = 0; i < numberOfColumnsInThisTable; i++){
-   			if(i == 0){
-   				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).removeAttr('style');
-   			} else {
-   				$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).removeAttr('style');
+   			for(var i = 0; i < numberOfColumnsInThisTable; i++){
+   				if(i == 0){
+   					$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("th").eq(originalColumnIndex).removeAttr('style');
+   				} else {
+   					$(".original-table").find("tr").find("."+thisColumn+"#"+thisColumnId).parent().parent().find("tr").eq(i).find("td").eq(originalColumnIndex).removeAttr('style');
+   				}
    			}
-   		}
-		if(!$markRowisShown){
+			
 			$(this).find(".glyphicon").hide();
 		}
 	});
 	
-	$markRowisShown = false;
-	
 	$("#empty-table tr").live("mouseleave", function() {
 		$(".empty-table").find("tr").removeAttr('style');
+		$(".empty-table").find("td").removeAttr('style');
+		$(".original-table").find("td.notInMainTable").removeAttr('style');
 		$markRowisShown = false;
 		$(this).find(".glyphicon").hide();
+		$(".empty-table").find(".onColumnColor").removeClass("onColumnColor");
 	});
 	
 	$(document).on("click", "#empty-table td:has(.glyphicon) ", function() {
 		if($markRowisShown){
 			$(this).parent().removeAttr('style');
+			$(this).parent().find("td:not('.onColumnColor')").removeAttr('style');
+			$(".original-table").find("td.notInMainTable").removeAttr('style');
 			$markRowisShown = false;
 		}else{
 			$(this).parent().css("background-color", "#fcf8e3");
+			var thisIndex = $(this).parent().index();
+			$(".original-table").find("td.usedInRow_" + (thisIndex - 1) + ":not([style*='background-color'])").css("background-color", "#fcf8e3").addClass("notInMainTable");
 			$markRowisShown = true;
 		}
 	});
 	
 	function setColumnColor(){
+		// Used different classes in case one wants to have different colors for different functions in a later stage of implementation
 		if(($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)){
 			var numOfOrderBy = $(".original-table").find(".orderByColumn").length;	
 			for(var e = 0; e < numOfOrderBy; e++){
