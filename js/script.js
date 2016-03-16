@@ -240,7 +240,6 @@ $( document ).ready(function() {
 	
 	$(document).on("click", ".wizard-footer .step a", function(e) {
 		e.preventDefault();
-		debugger;
 		var stepnum = $(this).attr("class");//get clicked step
 		stepnum = parseInt(stepnum);
 		var anum = parseInt($(this).html());

@@ -111,6 +111,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 	// If this element is duplicate in original table
 	//if(duplData > 1){
 	while (isRightElem == false) {
+		debugger;
 		// The previous column's name in empty-table
 		var prevEmptyTableColumn = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().children().first().find("th").eq(columnIndexEmpty - 1).text();
 		// The previous column's name in original-table

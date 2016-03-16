@@ -2,7 +2,7 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array()) {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array(), $isMultipleJoin=false, $thisStep=1) {
 		if(!empty($previousTable) && $step > 1){
 			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
@@ -56,6 +56,8 @@ class tbl{
 		</table>
 		<?php
 		}else{
+			//echo count($tableName[0]);
+			//echo $step;
 			if($step <= count($tableName[0])){
 				$counter = $step-1;
 				$query = "SELECT * FROM " . $tableName[0][$counter];
@@ -180,7 +182,8 @@ class tbl{
 			}
 			else { //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
 				if(($step > (count($tableName[0])+1)) && (!empty($prevTable))){ ?>
-					<table class='table table-bordered original-table org-db-table <?echo $crossClassName;?>'>
+					
+					<table class='table table-bordered original-table org-db-table <?echo $crossClassName;?>' id='prevTable'>
 						<tbody>
 						<tr> 
 			
@@ -190,8 +193,9 @@ class tbl{
 								$var = (string)$previousTable[$step][1]['contents'];
 								$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
 								$tempString = str_replace($removeWords, "", $var);
-								$tempQuery = strstr($tempString, 'FROM');
-								$tempQuery = "SELECT * " . $tempQuery . " LIMIT 1";
+								$tempQueryOne = strstr($tempString, 'FROM');
+								
+								$tempQuery = "SELECT * " . $tempQueryOne . " LIMIT 1";
 								$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 								$tempResult = mysqli_query($con, $tempQuery);
 								mysqli_close($con);
@@ -267,10 +271,59 @@ class tbl{
 						</tbody>
 						</table>
 						<?php
+						if($isMultipleJoin && $thisStep < count($tableName[0])){
+							$query = "SELECT * FROM " . $tableName[0][$thisStep];
+							$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
+							$tableResult = mysqli_query($con, $query);
+							
+							for($j = 0; $j < $tableResult->num_rows; $j++){
+								$queryResultJoin[] = mysqli_fetch_array($tableResult);
+							} 
+							echo "<b>" . $tableName[0][$thisStep] . "</b>";
+							?>
+							<table class='table table-bordered original-table <?php echo $tableName[0][$thisStep]; ?>' id='<?php echo $tableName[0][$thisStep]; ?>'>
+								<tbody>
+									<tr>
+										<?php
+										$keys = array_keys($queryResultJoin[0]);
+										for($k=1, $c=0; $k < count($keys); $k+= 2, $c++) {
+										$finfo = mysqli_fetch_field_direct($tableResult, $c);
+											$onClassName = "";
+											if(!empty($onColumns)){
+												for($r = 0; $r < count($onColumns[0]); $r++){
+													if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+													}
+													if($keys[$k] === $thisOnColumn){
+														$onClassName = "onColumn";
+													}
+												}
+											}
+											echo '<th class="'. $onClassName . ' '. $keys[$k] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$k] . '</p></th>';
+										}
+										unset($keys);
+										?>
+									</tr>
+										<?php
+										for($m=0; $m < count($queryResultJoin); $m++){
+											echo "<tr id='data'>";
+											for($n=0; $n<count($queryResultJoin[$m])/2; $n++) {
+												echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $queryResultJoin[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $queryResultJoin[$m][$n] . '</span></td>';
+											}
+											echo "</tr>";
+										} 
+										mysqli_free_result($tableResult);?>
+								</tbody>
+							</table> <?php		
+						}
 				}
 				else {
+					$numberOfTables = count($tableName[0]);
+					if($isMultipleJoin){
+						$numberOfTables = 2;
+					}
 					for($i = 0; $i < $step; $i++){
-					if($i < count($tableName[0])){
+					if($i < $numberOfTables){
 						$query = "SELECT * FROM " . $tableName[0][$i];
 						$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 						$tableResult = mysqli_query($con, $query);

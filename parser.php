@@ -18,6 +18,7 @@
 		private $isJOIN;
 		private $onOrderBy;
 		private $onGroupBy;
+		private $isMultipleJoin;
 
 
 		public function __construct($sql, $database_connection) {
@@ -36,6 +37,7 @@
 			$this->isJOIN = false;
 			$this->onOrderBy = array();
 			$this->onGroupBy = array();
+			$this->isMultipleJoin = false;
 		}
 		
 		public function parse_sql_query($step=0) {
@@ -65,12 +67,51 @@
 				}
 				$this->onColumns[] = $this->parser->parsed['FROM'][1]['ref_clause'];
 			}
-			// Add the full FROM-part
-			$select=$this->buildSubQuery('FROM',$this->parser->parsed['FROM'],$select);
-			if(isset($this->parser->parsed['WHERE'])){
+			
+			// If the query contains multiple JOINS
+			if(count($this->parser->parsed['FROM']) > 2) 
+			{
+				$this->isMultipleJoin = true;
+				for ($i = 0; $i < count($this->parser->parsed['FROM']); $i++)
+				{
+					if(($i+1) == 2)
+					{ 
+						// Add first two tables from JOIN
+						$count = $i-1;
+						$joined_table = $select;
+						$temp['0'] = $this->parser->parsed['FROM'][$count];
+						$temp['1'] = $this->parser->parsed['FROM'][$i];
+						$joined_table = $this->buildSubQuery('FROM', $temp, $joined_table);
+					}
+					else if(($i+1) > 2)
+					{
+						if($i+1 == count($this->parser->parsed['FROM'])){
+							// Add the full FROM-part
+							$select=$this->buildSubQuery('FROM',$this->parser->parsed['FROM'],$select);
+						}
+						else {
+							// Add this JOIN table plus the previous ones
+							$joined_table = $select;
+							for($a = 0; $a <= $i; $a++){
+								$temp[$a] = $this->parser->parsed['FROM'][$a];
+							}
+							$joined_table = $this->buildSubQuery('FROM', $temp, $joined_table);
+						}
+					}
+				}
+			}
+			else {
+				// Add the full FROM-part
+				$select=$this->buildSubQuery('FROM',$this->parser->parsed['FROM'],$select);
+			}
+			
+			if(isset($this->parser->parsed['WHERE']))
+			{
 				$select=$this->buildSubQuery('WHERE',$this->parser->parsed['WHERE'],$select);
-				for($k = 0; $k < count($select["WHERE"]); $k++){
-					if(array_key_exists( 'no_quotes', $select["WHERE"][$k])){
+				for($k = 0; $k < count($select["WHERE"]); $k++)
+				{
+					if(array_key_exists( 'no_quotes', $select["WHERE"][$k]))
+					{
 						$this->whereColumns[] = $select["WHERE"][$k]["no_quotes"]["parts"][0];
 					}
 				}
@@ -328,7 +369,7 @@
 			}
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
-				
+				//print_r($this->parser->parsed);
 				echo "<div class='panel-body'>";
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
@@ -336,7 +377,7 @@
 					}
 					else if ($output['type']=='table') {
 						$TBL = new tbl();
-						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql, $this->parser->parsed);
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql, $this->parser->parsed, $this->isMultipleJoin, $thisStep);
 					}
 				}
 				echo "</div>";
