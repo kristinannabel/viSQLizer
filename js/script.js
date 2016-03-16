@@ -165,7 +165,7 @@ $( document ).ready(function() {
 	$("#empty-table tr").live("mouseleave", function() {
 		$(".empty-table").find("tr").removeAttr('style');
 		$(".empty-table").find("td").removeAttr('style');
-		$(".original-table").find("td.notInMainTable").removeAttr('style');
+		$(".original-table").find("td").removeAttr('style');
 		$markRowisShown = false;
 		$(this).find(".glyphicon").hide();
 		$(".empty-table").find(".onColumnColor").removeClass("onColumnColor");
