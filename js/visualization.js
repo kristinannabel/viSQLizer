@@ -502,6 +502,7 @@ function init() {
 						var numOfWheres = $(".original-table").find(".where").length;
 						for (var e = 0; e < numOfWheres; e++) {
 							var whereIndex = $(".original-table").find(".where").eq(e).index();
+							$(".original-table").find(".where").eq(e).addClass("usedWhere");
 							if ($(this.htmlElement.parentElement).index() == whereIndex) {
 								$(this.htmlElement.parentElement).addClass("usedWhere");
 							}
@@ -516,6 +517,7 @@ function init() {
 							var numOfOns = $(".original-table").eq(t).find(".onColumn").length;
 							for (var e = 0; e < numOfOns; e++) {
 								var onIndex = $(".original-table").eq(t).find(".onColumn").eq(e).index();
+								$(".original-table").eq(t).find(".onColumn").eq(e).addClass("usedOn");
 								if (($(this.htmlElement.parentElement).index() == onIndex) && ($(this.htmlElement.parentElement.parentElement.parentElement.parentElement).is(".original-table:eq(" + t + ")"))) {
 									$(this.htmlElement.parentElement).addClass("usedOn");
 								}

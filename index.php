@@ -39,7 +39,7 @@
     </head>
     <body onload="init();"><!---->
         <div class="page-header">
-            <h1><a href="/"> viSQLizer</a> <small>  SQL learning tool </small> </h1>
+            <h1><a href=<?php ROOT?> > viSQLizer</a> <small>  SQL learning tool </small> </h1>
         </div>
 		
 		<div class="col-md-9 content">

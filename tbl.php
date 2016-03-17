@@ -126,10 +126,10 @@ class tbl{
 							}
 							
 							$onClassName = "";
-							if(!empty($onColumns)){
-							for($r = 0; $r < count($onColumns[0]); $r++){
-								if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
-								    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+							if(!empty($onColumns[1]['ref_clause'])){
+							for($r = 0; $r < count($onColumns[1]['ref_clause'][0]); $r++){
+								if (($pos = strpos($onColumns[1]['ref_clause'][0][$r]['base_expr'], ".")) !== FALSE) { 
+								    $thisOnColumn = substr($onColumns[1]['ref_clause'][0][$r]['base_expr'], $pos+1); 
 									if($keys[$k] === $thisOnColumn){
 										$onClassName = "onColumn";
 									}
@@ -223,10 +223,10 @@ class tbl{
 											}
 							
 											$onClassName = "";
-											if(!empty($onColumns)){
-												for($r = 0; $r < count($onColumns[0]); $r++){
-													if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
-														$thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+											if(!empty($onColumns[0][$thisStep]['ref_clause'])){
+												for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree']); $r++){
+													if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], $pos+1); 
 														if($keys[$i] === $thisOnColumn){
 															$onClassName = "onColumn";
 														}
@@ -289,13 +289,35 @@ class tbl{
 										for($k=1, $c=0; $k < count($keys); $k+= 2, $c++) {
 										$finfo = mysqli_fetch_field_direct($tableResult, $c);
 											$onClassName = "";
-											if(!empty($onColumns)){
-												for($r = 0; $r < count($onColumns[0]); $r++){
-													if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
-														$thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
+											if(!empty($onColumns[0][$thisStep]['ref_clause'])){
+												for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree']); $r++){
+													if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], $pos+1); 
+														if($keys[$k] === $thisOnColumn){
+															$onClassName = "onColumn";
+														}
 													}
-													if($keys[$k] === $thisOnColumn){
-														$onClassName = "onColumn";
+												}
+											}
+											$whereClassName = "";
+											for($r = 0; $r < count($whereColumns); $r++){
+												if($keys[$i] == $whereColumns[$r]){
+													$whereClassName = "where";
+												}
+											}
+											$OrderByClassName = "";
+											if(!empty($onOrderBy)){
+												for($a = 0; $a < count($onOrderBy); $a++){
+													if($keys[$i] === $onOrderBy[$a]["base_expr"]){
+														$OrderByClassName = "orderByColumn";
+													}
+												}
+											}
+											$GroupByClassName = "";
+											if(!empty($onGroupBy)){
+												for($a = 0; $a < count($onGroupBy); $a++){
+													if($keys[$i] === $onGroupBy[$a]["base_expr"]){
+														$GroupByClassName = "orderByColumn";
 													}
 												}
 											}
@@ -318,6 +340,7 @@ class tbl{
 						}
 				}
 				else {
+					// Show all previous tables in one step
 					$numberOfTables = count($tableName[0]);
 					if($isMultipleJoin){
 						$numberOfTables = 2;
@@ -381,15 +404,27 @@ class tbl{
 										}
 									}
 									$onClassName = "";
-									if(!empty($onColumns)){
-									for($r = 0; $r < count($onColumns[0]); $r++){
-										if (($pos = strpos($onColumns[0][$r]['base_expr'], ".")) !== FALSE) { 
-										    $thisOnColumn = substr($onColumns[0][$r]['base_expr'], $pos+1); 
-											if($keys[$k] === $thisOnColumn){
-												$onClassName = "onColumn";
+									if(!empty($onColumns[0][$thisStep]['ref_clause'])){
+										if(!empty($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'])){
+											for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree']); $r++){
+												if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], ".")) !== FALSE) { 
+										    		$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], $pos+1); 
+													if($keys[$k] === $thisOnColumn){
+														$onClassName = "onColumn";
+													}
+												}
 											}
 										}
-									}
+										else {
+											for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause']); $r++){
+												if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'], ".")) !== FALSE) { 
+										    		$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'], $pos+1); 
+													if($keys[$k] === $thisOnColumn){
+														$onClassName = "onColumn";
+													}
+												}
+											}
+										}
 									}
 									$OrderByClassName = "";
 									if(!empty($onOrderBy)){

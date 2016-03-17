@@ -65,7 +65,7 @@
 					
 					$source_table = $this->buildSubQuery('FROM', $temp, $source_table);
 				}
-				$this->onColumns[] = $this->parser->parsed['FROM'][1]['ref_clause'];
+				$this->onColumns[] = $this->parser->parsed['FROM'];//[1]['ref_clause'];
 			}
 			
 			// If the query contains multiple JOINS
@@ -371,6 +371,7 @@
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
 				//print_r($this->parser->parsed);
 				echo "<div class='panel-body'>";
+				//print_r($this->onColumns);
 				foreach($this->singleStepTable[$step] as $output) {
 					if (($output['type']=='text') or ($output['type']=='query')){
 						echo "<div class='alert alert-info-decomposer' role='alert'>".$output['contents']."</div>";
