@@ -280,6 +280,7 @@
 		private function highlightText($textArray1,$textArray2) {
 			$keys=array();
 			$textArray1=cleanArray($textArray1);
+			//$textArray2=$textArray1;
 			if (!$textArray2==null) {
 				$keys=sortTextArrayKeys($textArray1,$textArray2);
 				for($i=0;$i<count($textArray1);$i++) {
@@ -297,15 +298,18 @@
 		 * Before the text are sent, they are turned into arrays, for easier comparison.
 		 */
 		private function compareQueries() {
-			$prev=array();
+			$tableName[] = $this->getListOfTables();
+			$prev=array('<i>returned', 'the', 'following', 'table:</i>');
 			$i=1;
 			foreach($this->singleStepTable as $step) {
-			$j=1;
+				$j=1;
 				foreach($step as $output) {
 					if ($output['type']=='query') {
 						$next=explode(' ',$output['contents']);
 						$this->singleStepTable[$i][$j]['contents']=$this->highlightText($next,$prev);
-						$prev=$next;
+						if($i >= (count($tableName[0])+1)){
+							$prev=$next;
+						}
 					}
 					$j++;
 				}
@@ -378,7 +382,7 @@
 			}
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function") && ($this->parser->parsed['FROM'][0]['alias']['name']!="NATURAL")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
-				print_r($this->parser->parsed['FROM'][0]['alias']['name']);
+				//print_r($this->singleStepTable[3]);
 				echo "<div class='panel-body'>";
 				
 				foreach($this->singleStepTable[$step] as $output) {
