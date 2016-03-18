@@ -171,7 +171,7 @@ class tbl{
 				for($m=0; $m < count($finalTbResult); $m++){ ?>
 					<tr id="data"> <?php
 							for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-								echo '<td class="original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+								echo '<td class="original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span class="textOrigin">'.$finalTbResult[$m][$n].'</span></td>';
 							}?>
 					</tr>
 					<?php
@@ -263,7 +263,7 @@ class tbl{
 									echo '<tr class="data">';
 											
 										for($j=0; $j<count($prevTable[$i])/2; $j++) {
-											echo '<td class="original-data original-data-'.$j.'"><span id="span_'.$j.'" class="span_'.$j.' extraSpan">' . $prevTable[$i][$j] . '</span><span id="original-span" class="used original-span_'.$j.'">' . $prevTable[$i][$j] . '</span></td>';
+											echo '<td class="original-data original-data-'.$j.'"><span id="span_'.$j.'" class="span_'.$j.' extraSpan">' . $prevTable[$i][$j] . '</span><span id="original-span" class="used original-span_'.$j.'">' . $prevTable[$i][$j] . '</span><span class="textOrigin">'.$prevTable[$i][$j].'</span></td>';
 										}?>
 									</tr>
 									<?php
@@ -330,7 +330,7 @@ class tbl{
 										for($m=0; $m < count($queryResultJoin); $m++){
 											echo "<tr id='data'>";
 											for($n=0; $n<count($queryResultJoin[$m])/2; $n++) {
-												echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $queryResultJoin[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $queryResultJoin[$m][$n] . '</span></td>';
+												echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $queryResultJoin[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $queryResultJoin[$m][$n] . '</span><span class="textOrigin">'.$queryResultJoin[$m][$n].'</span></td>';
 											}
 											echo "</tr>";
 										} 
@@ -462,7 +462,7 @@ class tbl{
 							
 							<tr id="data">	<?php
 									for($n=0; $n<count($finalTbResult[$m])/2; $n++) {
-										echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span></td>';
+										echo '<td class=" original-data original-data-'.$n.'"><span id="span_'.$n.'" class="span_'.$n.' extraSpan">' . $finalTbResult[$m][$n] . '</span><span id="original-span" class="used original-span_'.$n.'">' . $finalTbResult[$m][$n] . '</span><span class="textOrigin">'.$finalTbResult[$m][$n].'</span></td>';
 									}?>
 							</tr>
 							<?php

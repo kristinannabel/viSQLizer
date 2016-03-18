@@ -39,7 +39,8 @@
 	margin-bottom: 0px !important;
 }
 #original-span {
-	display: none;
+	/*display: none;*/
+	display: inline-block;
 }
 #demoCanvas {
     z-index: 2;

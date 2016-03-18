@@ -21,6 +21,49 @@ function setViewToEmptyTable(thCount) {
 	}
 }
 
+function setViewToOriginalTable() {
+	$(".original-table").find(".textOrigin").hide();
+	var tableCount = $(".original-table").length;
+	for(var u = 0; u < tableCount; u++){ // For each table
+		var thCount = $(".original-table").eq(u).find("th").length;
+		for(var a = 0; a < thCount; a++){ // For each column
+			var spanName = ".span_" + a;
+			var numOfSpans = $(".original-table").eq(u).find(spanName).length;
+			for(var i = 0; i < numOfSpans; i++){ // For each cell in the column
+				while ($(".original-table").eq(u).find(spanName).eq(i).height() > 20) {
+					$(".original-table").eq(u).find(spanName).eq(i).text(function(index, text) {
+						return text.replace(/\W*\s(\S)*$/, '...');
+						// Cut last word out, replace with '...'
+					});
+				}
+			}
+			var otherSpanName = ".original-span_" + a;
+			var numOfSpans = $(".original-table").eq(u).find(otherSpanName).length;
+			for(var i = 0; i < numOfSpans; i++){ // For each cell in the column
+				$(".original-table").eq(u).find(otherSpanName).eq(i).text($(".original-table").eq(u).find(spanName).eq(i).text());
+				$(".original-table").eq(u).find(otherSpanName).eq(i).hide();
+			}
+			// Do it again, to ensure everything ends up in one line
+			var numOfSpans = $(".original-table").eq(u).find(spanName).length;
+			for(var i = 0; i < numOfSpans; i++){ // For each cell in the column
+				while ($(".original-table").eq(u).find(spanName).eq(i).height() > 20) {
+					$(".original-table").eq(u).find(spanName).eq(i).text(function(index, text) {
+						return text.replace(/\W*\s(\S)*$/, '...');
+						// Cut last word out, replace with '...'
+					});
+				}
+			}
+			var numOfSpans = $(".original-table").eq(u).find(otherSpanName).length;
+			for(var i = 0; i < numOfSpans; i++){ // For each cell in the column
+				$(".original-table").eq(u).find(otherSpanName).eq(i).text($(".original-table").eq(u).find(spanName).eq(i).text());
+				$(".original-table").eq(u).find(otherSpanName).eq(i).hide();
+			}
+			var orgElemWidth = $(".original-table").eq(u).find(otherSpanName).eq(i).width();
+			$(".original-table").eq(u).find(spanName).eq(i).css("width", orgElemWidth)
+		}
+	}
+}
+
 /*
  * Function for checking if data is duplicated in the specific original-table
  * Checks if the right element is sent, and not just first occurence of similar element
@@ -35,14 +78,14 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 			countNumOfEquals = 0;
 			for(var h=0; h < numberOfColumns; h++){
 				var thisEmptyText = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td").eq(h).find("span.textOrigin").html();
-				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").eq(h).find("span.extraSpan").html();
+				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").eq(h).find("span.textOrigin").html();
 				if(thisEmptyText === thisOrgText){
 					countNumOfEquals++;
 				}
 			}
 			if(countNumOfEquals != numberOfColumns){
 				thisGetTextOrigin.first().addClass("notInUse");
-				var thisGetTextOrigin = $(".original-table").find("span.extraSpan:not(.notInUse)").filter(function() {
+				var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.notInUse)").filter(function() {
 					return $(this).html() === textContent;
 				});
 			}
@@ -57,7 +100,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 				var thisEmptyText = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td").eq(h).find("span.textOrigin").html();
 				var thisEmptyColumnName = $("#empty-table").find("tr").first().find("th").eq(h).text();
 				var thisEmptyIdName = $("#empty-table").find("tr").first().find("th").eq(h).attr("id");
-				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+				var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.textOrigin:not(.notInUse)").filter(function() {
 					return $(this).html() === thisEmptyText;
 				});
 				var jumpOut = false;
@@ -65,7 +108,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 					if(thisOrgText.length == 0){
 						jumpOut = true;
 						thisOrgText.first().addClass("notInUse");
-						var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+						var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.textOrigin:not(.notInUse)").filter(function() {
 							return $(this).html() === thisEmptyText;
 						});
 					}
@@ -80,7 +123,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 						else{
 							//get next element
 							thisOrgText.first().addClass("notInUse");
-							var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.extraSpan:not(.notInUse)").filter(function() {
+							var thisOrgText = thisGetTextOrigin.first().parent().parent().find("td").find("span.textOrigin:not(.notInUse)").filter(function() {
 								return $(this).html() === thisEmptyText;
 							});
 						}
@@ -89,7 +132,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 			}
 			if(countNumOfEquals != numberOfColumns){
 				thisGetTextOrigin.first().addClass("notInUse");
-				var thisGetTextOrigin = $(".original-table").find("span.extraSpan:not(.used):not(.notInUse)").filter(function() {
+				var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.used):not(.notInUse)").filter(function() {
 					return $(this).html() === textContent;
 				});
 			}
@@ -111,7 +154,6 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 	// If this element is duplicate in original table
 	//if(duplData > 1){
 	while (isRightElem == false) {
-		debugger;
 		// The previous column's name in empty-table
 		var prevEmptyTableColumn = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().children().first().find("th").eq(columnIndexEmpty - 1).text();
 		// The previous column's name in original-table
@@ -124,42 +166,22 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 		if (((thisGetTextOrigin.first().parent().is(':first-child')) && (thisGetTextOrigin.first().parent().parent().parent().has(".usedInRow").length == 0) && (thisEmptyId == thisOriginalId)) || ((thisEmptyId == thisOriginalId) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").has(".usedInRow").length == 0) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).text() === $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().find("th").eq(thisEmptyIndex).text()))) {
 			// If this is the first element in this row
 			isRightElem = true;
-			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
+			return $(thisGetTextOrigin[0]).parent().find("span.extraSpan").attr("id", "animThis").next();
 		} else if ((thisGetTextOrigin.first().parent().parent().has(".usedInRow").length != 0) && (!thisGetTextOrigin.first().parent().hasClass("usedInRow")) && (thisEmptyId == thisOriginalId)) {
 			// If this has siblings with class usedInRow, siblings that have been used already on this row
 			isRightElem = true;
-			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
+			return $(thisGetTextOrigin[0]).parent().find("span.extraSpan").attr("id", "animThis").next();
 		} else if ((!thisGetTextOrigin.first().parent().siblings().find("span:not(#original-span)").hasClass("used")) && ((isNotFirstColumn) && (thisEmptyId == thisOriginalId) && (prevEmptyTableColumn != prevOriginalTableColumn) && (!thisGetTextOrigin.first().parent().parent().parent().find("tr").has(".usedInRow").find("td").eq(thisOriginalIndex).hasClass("usedInRow")) && (thisGetTextOrigin.first().parent().parent().parent().find("tr").first().find("th").eq(thisOriginalIndex).text() === $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").parent().parent().find("th").eq(thisEmptyIndex).text()))) {
 			// If this element is first to be used in row even if it is not first element
 			// This test does not work if AS is set on column names in query
 			isRightElem = true;
-			return $(thisGetTextOrigin[0]).attr("id", "animThis").next();
+			return $(thisGetTextOrigin[0]).parent().find("span.extraSpan").attr("id", "animThis").next();
 		} else {
 			// This element is not the right one, find next occurence
 			thisGetTextOrigin.first().addClass("notInUse");
-			var thisGetTextOrigin = $(".original-table").find("span:not(.used):not(.notInUse)").filter(function() {
+			var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.used):not(.notInUse)").filter(function() {
 				return $(this).html() === textContent;
 			});
-		}
-	}
-	//}
-	/*else {
-		// If this element is alone in this table, it is the only possible element to choose
-		return $(thisGetTextOrigin[0]).attr("id","animThis").next();
-	}*/
-}
-
-function setSpanWidth() {
-	for (var a = 0; a < $(".original-table").length; a++) {
-		var columnCount = $(".original-table").eq(a).find("tr").first().find("th").length;
-		for (var b = 0; b < columnCount; b++) {
-			var columnWidth = $(".original-table").eq(a).find("tr").first().find("th").eq(b).outerWidth();
-			numOfRows = $(".original-table").eq(a).find("tr").length;
-			for (var c = 1; c < numOfRows; c++) {
-				if ($(".original-table").eq(a).find("tr").eq(c).find("td").eq(b).find(".extraSpan").outerWidth() > columnWidth) {
-					$(".original-table").eq(a).find("tr").eq(c).find("td").eq(b).find(".extraSpan").css("width", columnWidth - 10);
-				}
-			}
 		}
 	}
 }
@@ -173,6 +195,7 @@ function init() {
 	// Do not run if no table is present in DOM
 	if ($(".streammode-panel").length != 0) {
 		$lastElemIsDone = false;
+		allChangePositionX = 0;
 		$arrowThisDone = false;
 		$isLast = false;
 		// Initial settings for the canvas
@@ -194,11 +217,12 @@ function init() {
 		formDOMElement.y = canvas.height * -0.50;
 
 		stage.addChild(formDOMElement);
-		//stage.update();
 
 		$("#main-panel#streammode-panel").css("z-index", "1");
 
 		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
+		setViewToEmptyTable(thCount);
+		setViewToOriginalTable();
 		setViewToEmptyTable(thCount);
 
 		// Number of tables in SQL view
@@ -236,7 +260,7 @@ function init() {
 				// Add class used to this element, so it is not used again
 				$("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span.textOrigin:contains('" + textContent + "')").addClass("used");
 
-				var thisGetTextOrigin = $(".original-table").find("span:not(.used)").filter(function() {
+				var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.used)").filter(function() {
 					return $(this).html() === textContent;
 				});
 
@@ -270,37 +294,20 @@ function init() {
 				var calcPositionX = emptyPosX - orPosX;
 
 				var thisDOMElem = $("#animThis").get(0);
-				if (localStorage['bigtext'] == "true") {
-					var animThisIndex = $("#animThis:not(.used)").parent().index();
-					/*if (animThisIndex > 0) {
-						if ($("#animThis:not(.used)").parent().parent().find(".usedInRow").length > 0) {
-							var prevElementXPos = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().position().left;
-							var $clone = $("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().clone().css({
-								width: "auto",
-								display: "none"
-							}).appendTo($("#animThis:not(.used)").parent().parent().find(".usedInRow").last().find("span").first().parent());
-							var prevElementWidth = $clone.outerWidth();
-							$clone.remove();
-						}
-					}*/
-					if ((animThisIndex > 0) && ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX))) {
-						var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
-					} else {
-						var changeXPosition = 0;
-					}
-					$prevCalcPositionX = calcPositionX;
-					$prevOrgPosXElem = orgPosXElem;
-					$prevChangeXPosition = changeXPosition;
-					var $clone2 = $("#animThis").first().clone().css({
-						width: "auto",
-						display: "none"
-					}).appendTo($("#animThis").parent());
-					$prevOrgWidth = $clone2.outerWidth();
-					$clone2.remove();
-					
+				var animThisIndex = $("#animThis:not(.used)").parent().index();
+				debugger;
+				//if ((animThisIndex > 0) && ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX))) {
+				if ((animThisIndex > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
+					var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
+				} else {
+					var changeXPosition = 0;
 				}
+				$prevCalcPositionX = calcPositionX;
+				$prevOrgPosXElem = orgPosXElem;
+				$prevChangeXPosition = changeXPosition;
+				$prevOrgWidth = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").width();
+				$allChangePositionX =  allChangePositionX + parseInt(changeXPosition);
 
-				setSpanWidth();
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
 				stage.addChild(textDOM);
@@ -323,7 +330,6 @@ function init() {
 								changeXPosition = $prevOrgWidth - $prevOrgPosXElem + 30;
 							}
 							calcPositionX = calcPositionX + changeXPosition;
-							//calcScalePositionX = calcPositionX;
 						}
 					}
 					if (dragOut == "true") {
@@ -345,7 +351,6 @@ function init() {
 							.to({
 								x: calcPositionX
 							}, 300, createjs.Ease.getPowIn(1))
-						//.to({y: calcPositionY, x: calcPositionX}, 1500, createjs.Ease.getPowIn(1))
 						.to({
 							scaleX: 1,
 							scaleY: 1,
@@ -359,36 +364,8 @@ function init() {
 								y: 0,
 								x: 0
 							}).call(tweenComplete);
-						getTextOrigin.show();
+							getTextOrigin.show();
 						// call to function tweenComplete after animation is completed
-					} else {
-						createjs.Tween.get(textDOM, {
-							loop: false
-						})
-							.wait(timeCount - newTimeCount).call(tweenStart)
-							.to({
-								scaleX: scaleX,
-								scaleY: scaleY,
-								x: changeXPosition
-							}, scaleTime)
-							.to({
-								y: calcPositionY,
-								x: calcPositionX
-							}, 1500, createjs.Ease.getPowIn(1))
-							.to({
-								scaleX: 1,
-								scaleY: 1,
-								x: calcScalePositionX
-							}, scaleTime)
-							.to({
-								alpha: 0
-							}, 0, createjs.Ease.getPowIn(1))
-							.to({
-								alpha: 1,
-								y: 0,
-								x: 0
-							}).call(tweenComplete);
-						getTextOrigin.show();
 					}
 				}
 				// If there is more than one original-table
@@ -405,7 +382,7 @@ function init() {
 							$(".original-table").find("span#animThis").removeAttr("id").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 						}
 						else {*/
-						$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+						$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 						//}
 					} else {
 						var duplicatesInAllTables = $(".original-table").find("span:not(.used)").filter(function() {
@@ -420,26 +397,26 @@ function init() {
 							
 							if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
 								//If Cartesian product
-								if(typeof $(".original-table").find("span#animThis").first().attr("value") === 'undefined'){
-									$(".original-table").find("span#animThis").first().attr("value", "0")
+								if(typeof $(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value") === 'undefined'){
+									$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", "0")
 								}
-								var numUsed = parseInt($(".original-table").find("span#animThis").first().attr("value"));
+								var numUsed = parseInt($(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value"));
 								if(numUsed < numOfReps){
 									if(duplicatesInAllTables - countOfDuplicates > countOfDuplicates){
-										$(".original-table").find("span#animThis").first().addClass("duplicate");
+										$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
 									}
 									numUsed = numUsed+1;
-									$(".original-table").find("span#animThis").first().attr("value", numUsed);
+									$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", numUsed);
 									if(numUsed == numOfReps){
-										$(".original-table").find("span#animThis").first().addClass("used");
+										$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
 									}
 								}
 								else {
-									$(".original-table").find("span#animThis").first().addClass("used");
+									$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
 								}
 							}
 							else {
-								$(".original-table").find("span#animThis").first().addClass("duplicate");
+								$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
 							}
 						}
 						else if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
@@ -447,27 +424,27 @@ function init() {
 							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
 							var thisRowCount = $(thisTable).find("tr#data").length;
 							var numOfReps = tableRows/thisRowCount;
-							if(typeof $(".original-table").find("span#animThis").first().attr("value") === 'undefined'){
-								$(".original-table").find("span#animThis").first().attr("value", "0")
+							if(typeof $(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value") === 'undefined'){
+								$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", "0")
 							}
-							var numUsed = parseInt($(".original-table").find("span#animThis").first().attr("value"));
+							var numUsed = parseInt($(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value"));
 							if(numUsed < numOfReps){
 								numUsed = numUsed+1;
-								$(".original-table").find("span#animThis").first().attr("value", numUsed);
+								$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", numUsed);
 								if(numUsed == numOfReps){
-									$(".original-table").find("span#animThis").first().addClass("used");
+									$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
 								}
 							}
 							else {
-								$(".original-table").find("span#animThis").first().addClass("used");
+								$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
 							}
 						}
 						// remove id animThis from element
-						$(".original-table").find("span#animThis").first().removeAttr("id").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+						$(".original-table").find("span#animThis").first().removeAttr("id").parent().find(".textOrigin").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 					}
 				} else {
 					// Element is used and used in row
-					$(".original-table").find("span#animThis").removeAttr("id").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+					$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 				}
 
 				/**
@@ -476,8 +453,9 @@ function init() {
 				 */
 
 				function tweenComplete() {
-					setSpanWidth();
 					$(this.htmlElement).html($(this.htmlElement).next().html());
+					var thisElemWidth = $(this.htmlElement).next().width() +1;
+					$(this.htmlElement).css("width", thisElemWidth);
 
 					var emptyTextPlace = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span");
 					emptyTextPlace.css("visibility", "visible"); //Check quick away and back
@@ -492,10 +470,10 @@ function init() {
 				 */
 
 				function tweenStart() {
-					$(this.htmlElement).css("width", "auto");
-					if ($("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin):contains('...')").length > 0) {
-						$(this.htmlElement).html($("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin):contains('...')").html());
-					}
+					var emptyElemWidth = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").width();
+					$(this.htmlElement).css("width", emptyElemWidth);
+					$(this.htmlElement).html($("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").html());
+					
 					$(this.htmlElement).addClass("whiteBrick").css("z-index", $zIndexNum);
 
 					if ($(".alert-info-decomposer").find("b:contains(WHERE)").length > 0) {
@@ -549,275 +527,6 @@ function init() {
 			})(j);
 
 			// Counting up the time counter for the animations by 2000ms
-
-			if (localStorage['dragout'] == 'false') {
-				//Plugin for creating a guide for animating arrows in an arc
-				createjs.MotionGuidePlugin.install();
-				var originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").first().position().top;
-				var originalPosX = $(".streammode-panel").width();
-				var emptyPosY = $("#empty-table").find("tr:nth-child(" + (i + 2) + ")").find("span:not(.textOrigin)").position().top;
-
-				var arrowStartPosY = originalPosY + (17 / 2) + 2;
-				var arrowStartPosX = originalPosX - 11;
-				var arrowEndPosY = emptyPosY + (17 / 2) + 2;
-				var middlePosY = ((arrowEndPosY - arrowStartPosY) / 2) + arrowStartPosY;
-
-				var shape = new createjs.Shape();
-				var bar = {
-					x: arrowStartPosX,
-					y: arrowStartPosY,
-					oldx: arrowStartPosX,
-					oldy: arrowStartPosY
-				};
-				stage.addChild(shape);
-
-				var arrowz = new createjs.Shape();
-				stage.addChild(arrowz);
-
-				createjs.Ticker.addEventListener("tick", tick);
-
-				run();
-
-				function getMotionPathFromPoints(points) {
-					var i, motionPath;
-					for (i = 0, motionPath = []; i < points.length - 1; ++i) {
-						if (i === 0) {
-							motionPath.push(points[i].x, points[i].y);
-						} else if (i === 1) {
-							motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-						} else {
-							i++;
-							motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-						}
-					}
-
-					return motionPath;
-				}
-
-				function run() {
-					var posXStart = arrowStartPosX + 200;
-					var points = [
-						new createjs.Point(arrowStartPosX, arrowStartPosY),
-						new createjs.Point(posXStart, middlePosY),
-						new createjs.Point(arrowStartPosX, arrowEndPosY)
-					];
-
-					if (localStorage['bigtext'] == "false") {
-						createjs.Tween.get(bar).wait(timeCount).to({
-							guide: {
-								path: getMotionPathFromPoints(points)
-							}
-						}, 1500).call(lastArrowAnimateComplete);
-					} else {
-						createjs.Tween.get(bar).wait(timeCount - 600).to({
-							guide: {
-								path: getMotionPathFromPoints(points)
-							}
-						}, 2100).call(lastArrowAnimateComplete);
-					}
-				}
-
-
-
-				function drawFilledPolygon(shape, arrowzShape) {
-					arrowzShape.graphics
-						.clear()
-						.beginFill("#000000")
-						.moveTo(shape[0][0], shape[0][1]);
-					for (p in shape) {
-						if (p > 0) {
-							arrowzShape.graphics.lineTo(shape[p][0], shape[p][1]);
-						}
-					}
-					arrowzShape.graphics.lineTo(shape[0][0], shape[0][1])
-						.endStroke();
-
-				};
-
-				function translateShape(shape, x, y) {
-					var rv = [];
-					for (p in shape)
-						rv.push([shape[p][0] + x, shape[p][1] + y]);
-					return rv;
-				};
-
-				function rotateShape(shape, ang) {
-					var rv = [];
-					for (p in shape)
-						rv.push(rotatePoint(ang, shape[p][0], shape[p][1]));
-					return rv;
-				};
-
-				function rotatePoint(ang, x, y) {
-					return [
-						(x * Math.cos(ang)) - (y * Math.sin(ang)), (x * Math.sin(ang)) + (y * Math.cos(ang))
-					];
-				};
-
-				var arrow = [
-					[2, 0],
-					[-10, -4],
-					[-10, 4]
-				];
-
-				function tick() {
-					if (!$lastElemIsDone) {
-
-
-						shape.graphics
-							.setStrokeStyle(2, 'round', 'round')
-							.beginStroke("#000000")
-							.curveTo(bar.oldx, bar.oldy, bar.x, bar.y)
-							.endStroke();
-						var ang = Math.atan2(bar.y - bar.oldy, bar.x - bar.oldx);
-						if (bar.y.toFixed(1) != arrowEndPosY.toFixed(1) && bar.x.toFixed(1) != arrowStartPosX.toFixed(1) && bar.oldx.toFixed(1) != arrowStartPosX.toFixed(1) && bar.oldy.toFixed(1) != arrowEndPosY.toFixed(1)) {
-							drawFilledPolygon(translateShape(rotateShape(arrow, ang), bar.x, bar.y), arrowz);
-
-						}
-
-						if (typeof shape2 !== 'undefined') {
-							shape2.graphics
-								.setStrokeStyle(2, 'round', 'round')
-								.beginStroke("#000000")
-								.curveTo(bahar.oldx, bahar.oldy, bahar.x, bahar.y)
-								.endStroke();
-							var ang = Math.atan2(bahar.y - bahar.oldy, bahar.x - bahar.oldx);
-							if (bahar.y.toFixed(1) != (originalPosY + (17 / 2) + 2).toFixed(1) && bahar.x.toFixed(1) != arrowStartPosX.toFixed(1) && bahar.oldx.toFixed(1) != arrowStartPosX.toFixed(1) && bahar.oldy.toFixed(1) != (originalPosY + (17 / 2) + 2).toFixed(1)) {
-								drawFilledPolygon(translateShape(rotateShape(arrow, ang), bahar.x, bahar.y), arrowz2);
-							}
-
-							bahar.oldx = bahar.x;
-							bahar.oldy = bahar.y;
-						}
-
-
-						//stage.update();
-
-						bar.oldx = bar.x;
-						bar.oldy = bar.y;
-						if ($arrowThisDone) {
-							$arrowThisDone = false;
-						}
-					}
-				}
-
-				function removeShapeFromStage() {
-					stage.removeChild(shape);
-					stage.removeChild(arrowz);
-				}
-
-				function removeShape2FromStage() {
-					stage.removeChild(shape2);
-					stage.removeChild(arrowz2);
-				}
-
-				function lastArrowAnimateComplete() {
-					$arrowThisDone = true;
-					if (localStorage['bigtext'] == "false") {
-						createjs.Tween.get(shape).to({
-							alpha: 0
-						}, 3000).call(removeShapeFromStage);
-						createjs.Tween.get(arrowz).to({
-							alpha: 0
-						}, 3000);
-						if (numberOfTables === 2) {
-							createjs.Tween.get(shape2).to({
-								alpha: 0
-							}, 3000).call(removeShape2FromStage);
-							createjs.Tween.get(arrowz2).to({
-								alpha: 0
-							}, 3000);
-						}
-						if (i == (tableRows - 1)) {
-							$lastElemIsDone = true;
-
-						}
-					} else {
-						createjs.Tween.get(shape).to({
-							alpha: 0
-						}, 3500).call(removeShapeFromStage);
-						createjs.Tween.get(arrowz).to({
-							alpha: 0
-						}, 3000);
-						if (numberOfTables === 2) {
-							createjs.Tween.get(shape2).to({
-								alpha: 0
-							}, 3500).call(removeShape2FromStage);
-							createjs.Tween.get(arrowz2).to({
-								alpha: 0
-							}, 3000);
-						}
-						if (i == (tableRows - 1)) {
-							$lastElemIsDone = true;
-
-						}
-					}
-
-				}
-
-				if (numberOfTables === 2) {
-					originalPosY = $(".original-table").find(".usedInRow").find("span").not("#original-span").last().position().top;
-
-					arrowStartPosY = originalPosY + (17 / 2) + 2;
-					var middlePosY = ((arrowEndPosY - arrowStartPosY) / 2) + arrowStartPosY;
-
-					var shape2 = new createjs.Shape();
-					var bahar = {
-						x: arrowStartPosX,
-						y: arrowStartPosY,
-						oldx: arrowStartPosX,
-						oldy: arrowStartPosY
-					};
-					stage.addChild(shape2);
-
-					var arrowz2 = new createjs.Shape();
-					stage.addChild(arrowz2);
-
-					//createjs.Ticker.addEventListener("tick", tick);
-
-					function getMotionPathFromPoints2(points) {
-						var i, motionPath;
-						for (i = 0, motionPath = []; i < points.length - 1; ++i) {
-							if (i === 0) {
-								motionPath.push(points[i].x, points[i].y);
-							} else if (i === 1) {
-								motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-							} else {
-								i++;
-								motionPath.push(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-							}
-						}
-
-						return motionPath;
-					}
-
-					function runner() {
-						var posXStart = arrowStartPosX + 200;
-						var points = [
-							new createjs.Point(arrowStartPosX, arrowStartPosY),
-							new createjs.Point(posXStart, middlePosY),
-							new createjs.Point(arrowStartPosX, arrowEndPosY)
-						];
-
-						if (localStorage['bigtext'] == "false") {
-							createjs.Tween.get(bahar).wait(timeCount).to({
-								guide: {
-									path: getMotionPathFromPoints2(points)
-								}
-							}, 1500).call(lastArrowAnimateComplete);
-						} else {
-							createjs.Tween.get(bahar).wait(timeCount - 400).to({
-								guide: {
-									path: getMotionPathFromPoints2(points)
-								}
-							}, 1900).call(lastArrowAnimateComplete);
-						}
-					}
-
-					runner();
-
-				}
-			}
 			// Remove this for animating all at once!
 			if (localStorage['animation'] == "normal") {
 				timeCount += 2200;

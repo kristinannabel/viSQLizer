@@ -107,7 +107,7 @@ $( document ).ready(function() {
 				var onName = $(".original-table").find(".onColumn").eq(e).text();
 				var thisIndex = $(this).index();
 				if($markRowisShown){
-					debugger;
+					
 				}
 				if($(this).parent().parent().find("tr").first().find("th").eq(thisIndex).text() == onName){ //Would not work with AS
 					$(this).css("background-color", "#fcf8c3").addClass("onColumnColor"); //mørk farge ved rad: #fcd1a1
