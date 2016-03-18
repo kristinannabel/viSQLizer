@@ -111,7 +111,7 @@
 				{
 					if(array_key_exists( 'no_quotes', $select["WHERE"][$k]))
 					{
-						$this->whereColumns[] = $select["WHERE"][$k]["no_quotes"]["parts"][0];
+						$this->whereColumns[] = $select["WHERE"][$k]["no_quotes"]["parts"];//[0];
 					}
 				}
 			}
@@ -212,7 +212,10 @@
 		private function addSubQuery($select) {
 			$this->creator->create($select);
 			$result = mysqli_query($this->db_connection, $this->creator->created);
-			echo mysqli_error($this->db_connection);
+			if(!$result){
+				echo "<br><div class='alert alert-danger' role='alert'>".mysqli_error($this->db_connection)."</div>";
+			}
+			else {
 			// Show the created SQL-query
 			$this->makeQuery($this->creator->created . " <i>returned the following table:</i>"); //Shows the created SQL-query
 			$result_array_select=array();
@@ -223,6 +226,7 @@
 			// Send the array to a table-creator, which prints the array as a table.
 			$this->makeTable($result_array_select,true);
 			$this->currentStep++;
+			}
 		}
 		private function explainFunction($aggr,$from) {
 			$name=$aggr['base_expr'];
@@ -367,9 +371,14 @@
 				echo "Aggregate functions is not supported by this version of the viSQLizer prototype!";
 				echo "</div>";
 			}
-			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function")) {
+			if($this->parser->parsed['FROM'][0]['alias']['name'] == "NATURAL"){
+				echo "<div class='alert alert-danger' role='alert'>";
+				echo "NATURAL JOIN is not supported by this version of the viSQLizer prototype!";
+				echo "</div>";
+			}
+			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function") && ($this->parser->parsed['FROM'][0]['alias']['name']!="NATURAL")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
-				//print_r($this->parser->parsed);
+				print_r($this->parser->parsed['FROM'][0]['alias']['name']);
 				echo "<div class='panel-body'>";
 				
 				foreach($this->singleStepTable[$step] as $output) {

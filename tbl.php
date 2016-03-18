@@ -119,8 +119,8 @@ class tbl{
 								
 							}
 							$whereClassName = "";
-							for($r = 0; $r < count($whereColumns); $r++){
-								if($keys[$k] == $whereColumns[$r]){
+							for($r = 0; $r < count($whereColumns[0]); $r++){
+								if($keys[$k] == $whereColumns[0][$r]){
 									$whereClassName = "where";
 								}
 							}
@@ -217,7 +217,13 @@ class tbl{
 											
 											$whereClassName = "";
 											for($r = 0; $r < count($whereColumns); $r++){
-												if($keys[$i] == $whereColumns[$r]){
+												if(count($whereColumns[$r]) > 1){
+													$numInArr = 1;
+												}
+												else {
+													$numInArr = 0;
+												}
+												if($keys[$i] == $whereColumns[$r][$numInArr]){
 													$whereClassName = "where";
 												}
 											}
@@ -300,8 +306,8 @@ class tbl{
 												}
 											}
 											$whereClassName = "";
-											for($r = 0; $r < count($whereColumns); $r++){
-												if($keys[$i] == $whereColumns[$r]){
+											for($r = 0; $r < count($whereColumns[0]); $r++){
+												if($keys[$i] == $whereColumns[0][$r]){
 													$whereClassName = "where";
 												}
 											}
@@ -399,7 +405,7 @@ class tbl{
 									}
 									$whereClassName = "";
 									for($r = 0; $r < count($whereColumns); $r++){
-										if($keys[$k] == $whereColumns[$r]){
+										if($keys[$k] == $whereColumns[$r][0]){
 											$whereClassName = "where";
 										}
 									}
