@@ -41,6 +41,7 @@
 }
 div[id="main-panel streammode-panel"].panel.panel-default.streammode-panel {
 	z-index: 2 !important;
+	max-width: 900px;
 }
 #original-span {
 	/*display: none;*/

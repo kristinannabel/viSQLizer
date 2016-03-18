@@ -245,14 +245,13 @@ $( document ).ready(function() {
 		var anum = parseInt($(this).html());
 		var input = $('#sql-query-input').val();
 		var query = input.replace(/"/g, "'");
-		$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
-			$(".streammode-panel").html($(".streammode-panel", data).html());
-			setActiveStep(anum);
-			setColumnColor();
-			init();
-			
-		});
-		
+			$.post("", {"stepnumber": stepnum, "sql-input": query}, function response(data){
+				$(".streammode-panel").html($(".streammode-panel", data).html());
+				
+				setActiveStep(anum);
+				setColumnColor();
+				init();
+			});
 	});
 	
 	$(document).on("click", ".wizard-footer .next a", function(e) {

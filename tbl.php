@@ -183,7 +183,7 @@ class tbl{
 			else { //When all original DB tables has been shown in each initial steps, begin showing the prev step result table
 				if(($step > (count($tableName[0])+1)) && (!empty($prevTable))){ ?>
 					
-					<table class='table table-bordered original-table org-db-table <?echo $crossClassName;?>' id='prevTable'>
+					<table class='table table-bordered original-table org-db-table <?echo $crossClassName; if($crossClassName != ""){echo " crossed";}?>' id='prevTable'>
 						<tbody>
 						<tr> 
 			

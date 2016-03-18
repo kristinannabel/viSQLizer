@@ -10,12 +10,19 @@ function setViewToEmptyTable(thCount) {
 		$(".empty-table").find(".textOrigin").hide();
 		var numOfSpans = $(".empty-table").find(spanName).length;
 		for (var j = 0; j < numOfSpans; j++) {
-			while ($(".empty-table").find(spanName).eq(j).height() > 16) {
+			var isFinished = false;
+			if($(".empty-table").find(spanName).eq(j).height() <= 20){
+				isFinished = true;
+			}
+			while (isFinished == false) {
 				// While this element has height grater than 16
 				$(".empty-table").find(spanName).eq(j).text(function(index, text) {
 					return text.replace(/\W*\s(\S)*$/, '...');
 					// Cut last word out, replace with '...'
 				});
+				if(($(".empty-table").find(spanName).eq(j).height() <= 20) || ($(".empty-table").find(spanName).eq(j).text().split(' ').length == 1)){
+					isFinished = true;
+				}
 			}
 		}
 	}
@@ -30,11 +37,18 @@ function setViewToOriginalTable() {
 			var spanName = ".span_" + a;
 			var numOfSpans = $(".original-table").eq(u).find(spanName).length;
 			for(var i = 0; i < numOfSpans; i++){ // For each cell in the column
-				while ($(".original-table").eq(u).find(spanName).eq(i).height() > 20) {
+				var isFinished = false;
+				if($(".original-table").eq(u).find(spanName).eq(i).height() <= 20){
+					isFinished = true;
+				}
+				while (isFinished == false) {
 					$(".original-table").eq(u).find(spanName).eq(i).text(function(index, text) {
 						return text.replace(/\W*\s(\S)*$/, '...');
 						// Cut last word out, replace with '...'
 					});
+					if(($(".original-table").eq(u).find(spanName).eq(i).height() <= 20) || ($(".original-table").eq(u).find(spanName).eq(i).text().split(' ').length == 1)){
+						isFinished = true;
+					}
 				}
 			}
 			var otherSpanName = ".original-span_" + a;
@@ -71,7 +85,8 @@ function setViewToOriginalTable() {
 
 function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount) {
 	var isRightElem = false;
-	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0)) && (thisGetTextOrigin.length > 1)) {
+	debugger;
+	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0) || ($(".original-table").hasClass("crossed"))) && (thisGetTextOrigin.length > 1)) {
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		var countNumOfEquals = 0;
 		while(countNumOfEquals != numberOfColumns){
@@ -91,7 +106,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 			}
 		}
 	}
-	else if($(".alert-info-decomposer:contains(*)").length == 0){
+	 else if($(".alert-info-decomposer:contains(*)").length == 0){
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		var countNumOfEquals = 0;
 		while(countNumOfEquals != numberOfColumns){
@@ -236,7 +251,6 @@ function init() {
 			$allChangePositionX = 0;
 			// Loop through each column on this (i) row in empty table
 			for (var j = 0; j < tableColumns; j++)(function(j) {
-
 				// Set rowCount. +2 because it should start at 1 and because the first row does not contain data
 				var rowCount = i + 2;
 				// Set columnCount. +1 because it should start at 1
@@ -290,7 +304,7 @@ function init() {
 				var calcPositionY = emptyPosY - originalPosY;
 				// Calculated position X from the original position and result position
 				var calcPositionX = emptyPosX - orPosX;
-				debugger;
+				
 				var thisDOMElem = $("#animThis").get(0);
 				var animThisIndex = $("#animThis:not(.used)").parent().index();
 				if ((animThisIndex > 0 && j > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
