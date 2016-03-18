@@ -256,7 +256,6 @@ $( document ).ready(function() {
 	});
 	
 	$(document).on("click", ".wizard-footer .next a", function(e) {
-		debugger;
 		e.preventDefault();
 		var stepnum = $(".wizard-footer").find(".active").find("a").attr("class"); //get active step
 

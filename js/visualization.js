@@ -195,7 +195,6 @@ function init() {
 	// Do not run if no table is present in DOM
 	if ($(".streammode-panel").length != 0) {
 		$lastElemIsDone = false;
-		allChangePositionX = 0;
 		$arrowThisDone = false;
 		$isLast = false;
 		// Initial settings for the canvas
@@ -216,10 +215,7 @@ function init() {
 		formDOMElement.x = canvas.width * 0.5;
 		formDOMElement.y = canvas.height * -0.50;
 		$("#main-panel.streammode-panel").css("z-index", "2");
-debugger;
 		stage.addChild(formDOMElement);
-
-		
 		
 		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		setViewToEmptyTable(thCount);
@@ -237,6 +233,7 @@ debugger;
 		$zIndexNum = tableRows * tableColumns;
 		// Lopp through each row in empty-table (the last table in DOM-view with query result)
 		for (var i = 0; i < tableRows; i++)(function(i) {
+			$allChangePositionX = 0;
 			// Loop through each column on this (i) row in empty table
 			for (var j = 0; j < tableColumns; j++)(function(j) {
 
@@ -293,10 +290,10 @@ debugger;
 				var calcPositionY = emptyPosY - originalPosY;
 				// Calculated position X from the original position and result position
 				var calcPositionX = emptyPosX - orPosX;
-
+				debugger;
 				var thisDOMElem = $("#animThis").get(0);
 				var animThisIndex = $("#animThis:not(.used)").parent().index();
-				if ((animThisIndex > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
+				if ((animThisIndex > 0 && j > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
 					var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
 				} else {
 					var changeXPosition = 0;
@@ -305,7 +302,7 @@ debugger;
 				$prevOrgPosXElem = orgPosXElem;
 				$prevChangeXPosition = changeXPosition;
 				$prevOrgWidth = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").width();
-				$allChangePositionX =  allChangePositionX + parseInt(changeXPosition);
+				$allChangePositionX =  $allChangePositionX + parseInt(changeXPosition);
 
 				//Create an DOMElement for the canvas
 				var textDOM = new createjs.DOMElement(thisDOMElem);
