@@ -35,15 +35,19 @@
 	color: #428bca;
 	text-decoration: none;
 }
-#main-panel#streammode-panel {
+
+#main-panel.streammode-panel {
 	margin-bottom: 0px !important;
+}
+div[id="main-panel streammode-panel"].panel.panel-default.streammode-panel {
+	z-index: 2 !important;
 }
 #original-span {
 	/*display: none;*/
 	display: inline-block;
 }
 #demoCanvas {
-    z-index: 2;
+    z-index: 3;
     position: relative;
 }
 .panel.panel-default.streammode-panel#main-panel#streammode-panel {

@@ -383,7 +383,7 @@
 				}
 				echo "</div>";
 				if($numOfSteps > 1){
-					echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#'>Previous</a></li>";
+					echo "<div class='panel-footer wizard-footer' style='text-align: center;'><ul class='pagination' style='margin: auto;'><li class='previous'><a href='#' onclick='stepClicked()'>Previous</a></li>";
 					$stepCounter = 1;
 					for($i = 1; $i <= $numOfSteps; $i++){
 						if($i > count($tableName[0])){
@@ -391,7 +391,7 @@
 							$stepCounter++;
 						}
 					}
-					echo "<li class='next'><a href='#'>Next</a></li></ul></div></div>";
+					echo "<li class='next'><a href='#' onclick='stepClicked()'>Next</a></li></ul></div></div>";
 				}
 				else {
 					echo "</div>";

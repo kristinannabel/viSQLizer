@@ -215,11 +215,12 @@ function init() {
 		// Move the form to right possition
 		formDOMElement.x = canvas.width * 0.5;
 		formDOMElement.y = canvas.height * -0.50;
-
+		$("#main-panel.streammode-panel").css("z-index", "2");
+debugger;
 		stage.addChild(formDOMElement);
 
-		$("#main-panel#streammode-panel").css("z-index", "1");
-
+		
+		
 		var thCount = $(".empty-table").children('tbody').find('tr').first().find("th").length;
 		setViewToEmptyTable(thCount);
 		setViewToOriginalTable();
@@ -295,8 +296,6 @@ function init() {
 
 				var thisDOMElem = $("#animThis").get(0);
 				var animThisIndex = $("#animThis:not(.used)").parent().index();
-				debugger;
-				//if ((animThisIndex > 0) && ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX))) {
 				if ((animThisIndex > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
 					var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
 				} else {

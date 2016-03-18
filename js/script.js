@@ -256,13 +256,14 @@ $( document ).ready(function() {
 	});
 	
 	$(document).on("click", ".wizard-footer .next a", function(e) {
+		debugger;
 		e.preventDefault();
 		var stepnum = $(".wizard-footer").find(".active").find("a").attr("class"); //get active step
 
 		var num = parseInt(stepnum);
 		num = num + 1; // get number of next step
 		var anum = parseInt($(".wizard-footer").find(".active").find("a").html()) + 1;
-		var thisstep = ".step" + num;
+		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
 			var input = $('#sql-query-input').val();
 			var query = input.replace(/"/g, "'");
@@ -287,7 +288,7 @@ $( document ).ready(function() {
 		num = num - 1; // get number of previous step
 		var anum = parseInt($(".wizard-footer").find(".active").find("a").html()) - 1;
 		
-		var thisstep = ".step" + num;
+		var thisstep = ".step" + anum;
 		if($(".wizard-footer").find(thisstep).length){
 			var input = $('#sql-query-input').val();
 			var query = input.replace(/"/g, "'");
