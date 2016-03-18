@@ -119,9 +119,11 @@ class tbl{
 								
 							}
 							$whereClassName = "";
-							for($r = 0; $r < count($whereColumns[0]); $r++){
-								if($keys[$k] == $whereColumns[0][$r]){
-									$whereClassName = "where";
+							if(!empty($whereColumns)){
+								for($r = 0; $r < count($whereColumns[0]); $r++){
+									if($keys[$k] == $whereColumns[0][$r]){
+										$whereClassName = "where";
+									}
 								}
 							}
 							
@@ -306,9 +308,11 @@ class tbl{
 												}
 											}
 											$whereClassName = "";
-											for($r = 0; $r < count($whereColumns[0]); $r++){
-												if($keys[$i] == $whereColumns[0][$r]){
-													$whereClassName = "where";
+											if(!empty($whereColumns)){
+												for($r = 0; $r < count($whereColumns[0]); $r++){
+													if($keys[$i] == $whereColumns[0][$r]){
+														$whereClassName = "where";
+													}
 												}
 											}
 											$OrderByClassName = "";
@@ -425,6 +429,12 @@ class tbl{
 											for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause']); $r++){
 												if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'], ".")) !== FALSE) { 
 										    		$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'], $pos+1); 
+													if($keys[$k] === $thisOnColumn){
+														$onClassName = "onColumn";
+													}
+												}
+												else if(!empty($onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'])) {
+													$thisOnColumn = $onColumns[0][$thisStep]['ref_clause'][$r]['base_expr'];
 													if($keys[$k] === $thisOnColumn){
 														$onClassName = "onColumn";
 													}
