@@ -2,7 +2,7 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array(), $isMultipleJoin=false, $thisStep=1) {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array(), $isMultipleJoin=false, $thisStep=1, $numericArrayResult=array()) {
 		if(!empty($previousTable) && $step > 1){
 			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
@@ -209,12 +209,94 @@ class tbl{
 									for($i=1, $c=0; $i <= count($keys); $i+= 2, $c++) {
 										if($i == count($keys) && !isset($keys[$i])){
 											$finfo = mysqli_fetch_field_direct($tempResult, $c);
-											echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+											
+											$whereClassName = "";
+											for($r = 0; $r < count($whereColumns); $r++){
+												if(count($whereColumns[$r]) > 1){
+													$numInArr = 1;
+												}
+												else {
+													$numInArr = 0;
+												}
+												if($finfo->name == $whereColumns[$r][$numInArr]){
+													$whereClassName = "where";
+												}
+											}
+											$onClassName = "";
+											if(!empty($onColumns[0][$thisStep]['ref_clause'])){
+												for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree']); $r++){
+													if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], $pos+1); 
+														if($keys[$i] === $thisOnColumn){
+															$onClassName = "onColumn";
+														}
+													}
+												}
+											}
+											$OrderByClassName = "";
+											if(!empty($onOrderBy)){
+												for($a = 0; $a < count($onOrderBy); $a++){
+													if($keys[$i] === $onOrderBy[$a]["base_expr"]){
+														$OrderByClassName = "orderByColumn";
+													}
+												}
+											}
+											$GroupByClassName = "";
+											if(!empty($onGroupBy)){
+												for($a = 0; $a < count($onGroupBy); $a++){
+													if($keys[$i] === $onGroupBy[$a]["base_expr"]){
+														$GroupByClassName = "orderByColumn";
+													}
+												}
+											}
+											
+											echo '<th class="' .$whereClassName .' '. $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
 											//Add classnames here as well later
 										}
 										else if(is_int($keys[$i])){
 											$finfo = mysqli_fetch_field_direct($tempResult, $keys[$i]-1);
-											echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+											
+											$whereClassName = "";
+											for($r = 0; $r < count($whereColumns); $r++){
+												if(count($whereColumns[$r]) > 1){
+													$numInArr = 1;
+												}
+												else {
+													$numInArr = 0;
+												}
+												if($finfo->name == $whereColumns[$r][$numInArr]){
+													$whereClassName = "where";
+												}
+											}
+											$onClassName = "";
+											if(!empty($onColumns[0][$thisStep]['ref_clause'])){
+												for($r = 0; $r < count($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree']); $r++){
+													if (($pos = strpos($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], ".")) !== FALSE) { 
+														$thisOnColumn = substr($onColumns[0][$thisStep]['ref_clause'][0]['sub_tree'][$r]['base_expr'], $pos+1); 
+														if($keys[$i] === $thisOnColumn){
+															$onClassName = "onColumn";
+														}
+													}
+												}
+											}
+											$OrderByClassName = "";
+											if(!empty($onOrderBy)){
+												for($a = 0; $a < count($onOrderBy); $a++){
+													if($keys[$i] === $onOrderBy[$a]["base_expr"]){
+														$OrderByClassName = "orderByColumn";
+													}
+												}
+											}
+											$GroupByClassName = "";
+											if(!empty($onGroupBy)){
+												for($a = 0; $a < count($onGroupBy); $a++){
+													if($keys[$i] === $onGroupBy[$a]["base_expr"]){
+														$GroupByClassName = "orderByColumn";
+													}
+												}
+											}
+											
+											echo '<th class="' .$whereClassName .' '. $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
 											//Add classnames here as well later
 										}
 										else {
@@ -260,7 +342,7 @@ class tbl{
 													}
 												}
 											}
-											echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . '</p></th>';
+											echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . print_r($whereColumns[1]) .'</p></th>';
 										}
 									} 
 								}unset($keys);
@@ -517,6 +599,9 @@ class tbl{
 			
 				<?php
 					$keys = array_keys($result[0]);
+					for($r = 0; $r < count($numericArrayResult); $r++){
+						$numericKeys = array_keys($numericArrayResult[$r]);
+					}// FIX later!! this is only for last step. Make it for every step, and check against result. Should have equal amount of columns. If not, get them
 					$var = (string)$previousTable[$step][1]['contents'];
 					$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
 					$tempString = str_replace($removeWords, "", $var);

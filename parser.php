@@ -211,6 +211,7 @@
 		}
 		private function addSubQuery($select) {
 			$this->creator->create($select);
+			
 			$result = mysqli_query($this->db_connection, $this->creator->created);
 			if(!$result){
 				echo "<br><div class='alert alert-danger' role='alert'>".mysqli_error($this->db_connection)."</div>";
@@ -279,7 +280,6 @@
 		 */
 		private function highlightText($textArray1,$textArray2) {
 			$keys=array();
-			$textArray2 = array_filter(array_merge(array(0), $textArray2));
 			$textArray1=cleanArray($textArray1);
 			//$textArray2=$textArray1;
 			if (!$textArray2==null) {
@@ -365,6 +365,12 @@
 				$finalTbResult[] = mysqli_fetch_array($tableResult);
 			}
 			
+			$secondResult = mysqli_query($this->db_connection, $this->creator->created);
+			$testArray = array();
+			for($i = 0; $i < $secondResult->num_rows; $i++){
+				$testArray[] = mysqli_fetch_row($secondResult);
+			}
+			
 			if(!empty($this->parser->parsed['SELECT'][0]['alias'])){
 				echo "<div class='alert alert-danger' role='alert'>";
 				echo "Alias is not supported by this version of the viSQLizer prototype!";
@@ -391,7 +397,7 @@
 					}
 					else if ($output['type']=='table') {
 						$TBL = new tbl();
-						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql, $this->parser->parsed, $this->isMultipleJoin, $thisStep);
+						$TBL->make_table($output['contents'], true, "dbtable", true, $step, $tableName, $this->whereColumns, $this->onColumns, $this->onOrderBy, $this->onGroupBy, $this->singleStepTable, $sql, $this->parser->parsed, $this->isMultipleJoin, $thisStep, $testArray);
 					}
 				}
 				echo "</div>";
