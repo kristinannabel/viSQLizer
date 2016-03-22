@@ -85,6 +85,18 @@ function setViewToOriginalTable() {
 
 function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount) {
 	var isRightElem = false;
+	
+	// Column index of this element
+	var columnIndexOriginal = thisGetTextOrigin.first().parent().index();
+
+	// Column index of this element in empty table
+	var columnIndexEmpty = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").index();
+	var isNotFirstColumn = false;
+
+	if ((columnIndexOriginal > 0) && (columnIndexEmpty > 0)) {
+		// If this is not the first column in both tables
+		isNotFirstColumn = true;
+	}
 	debugger;
 	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0) || ($(".original-table").hasClass("crossed"))) && (thisGetTextOrigin.length > 1)) {
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
@@ -106,7 +118,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 			}
 		}
 	}
-	 else if($(".alert-info-decomposer:contains(*)").length == 0){
+	 else if($(".original-table").length == 1 && !isNotFirstColumn){//CHANGE WAS $(".alert-info-decomposer:contains(*)").length == 0
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		var countNumOfEquals = 0;
 		while(countNumOfEquals != numberOfColumns){
@@ -154,17 +166,7 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 		}
 	}
 
-	// Column index of this element
-	var columnIndexOriginal = thisGetTextOrigin.first().parent().index();
-
-	// Column index of this element in empty table
-	var columnIndexEmpty = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").index();
-	var isNotFirstColumn = false;
-
-	if ((columnIndexOriginal > 0) && (columnIndexEmpty > 0)) {
-		// If this is not the first column in both tables
-		isNotFirstColumn = true;
-	}
+	
 
 	// If this element is duplicate in original table
 	//if(duplData > 1){
@@ -272,149 +274,223 @@ function init() {
 				// Add class used to this element, so it is not used again
 				$("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span.textOrigin:contains('" + textContent + "')").addClass("used");
 
-				var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.used)").filter(function() {
+				var thisGetTextOrigin = $(".original-table").find("span.textOrigin:not(.used):not(.notInUse)").filter(function() {
 					return $(this).html() === textContent;
 				});
-
-				var thisTable = thisGetTextOrigin.first().parent().parent().parent().parent();
-				var duplData = $(thisTable).find("span:not(.used):contains('" + textContent + "')").length;
-				// The element to be shown in original table when animation begins. The current element to be animated get id animThis in this function
-				var getTextOrigin = checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount);
-				// Y position of the element in the original table
-				var originalPosY = $(".original-table").find("span#animThis").first().position().top;
-				// X position of the lement in the original table
-				var orgPosXElem = $(".original-table").find("span#animThis").first().position().left;
-				var originalPosX = $(".streammode-panel").width();
-				// Y position of the element in the empty-table
-				var emptyPosY = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").position().top;
-				// X position of the element in the empty-table
-				var emptyPosX = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").position().left;
-
-				// If there is more than one original-table
-				if (numberOfTables > 1) {
-					// Get the right table for the element
-					var thisTableTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
-					var thisTable = "#" + thisTableTemp;
-					var orPosX = $(thisTable).find("span#animThis").position().left;
-				} else {
-					var orPosX = $(".original-table").find("span#animThis").position().left;
-				}
-
-				// Calculated position Y from the original position and result position
-				var calcPositionY = emptyPosY - originalPosY;
-				// Calculated position X from the original position and result position
-				var calcPositionX = emptyPosX - orPosX;
+				if(thisGetTextOrigin.length != 0){
+					var thisTable = thisGetTextOrigin.first().parent().parent().parent().parent();
+					var duplData = $(thisTable).find("span:not(.used):contains('" + textContent + "')").length;
+					// The element to be shown in original table when animation begins. The current element to be animated get id animThis in this function
+					var getTextOrigin = checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCount, columnCount);
 				
-				var thisDOMElem = $("#animThis").get(0);
-				var animThisIndex = $("#animThis:not(.used)").parent().index();
-				if ((animThisIndex > 0 && j > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
-					var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
-				} else {
-					var changeXPosition = 0;
-				}
-				$prevCalcPositionX = calcPositionX;
-				$prevOrgPosXElem = orgPosXElem;
-				$prevChangeXPosition = changeXPosition;
-				$prevOrgWidth = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").width();
-				$allChangePositionX =  $allChangePositionX + parseInt(changeXPosition);
+					// Y position of the element in the original table
+					var originalPosY = $(".original-table").find("span#animThis").first().position().top;
+					// X position of the lement in the original table
+					var orgPosXElem = $(".original-table").find("span#animThis").first().position().left;
+					var originalPosX = $(".streammode-panel").width();
+					// Y position of the element in the empty-table
+					var emptyPosY = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").position().top;
+					// X position of the element in the empty-table
+					var emptyPosX = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").position().left;
 
-				//Create an DOMElement for the canvas
-				var textDOM = new createjs.DOMElement(thisDOMElem);
-				stage.addChild(textDOM);
-
-				animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition);
-
-				function animateTextFromDOM(bigText, dragOut, changeXPosition) {
-					var scaleX = 1;
-					var scaleY = 1;
-					var scaleTime = 0;
-					var newTimeCount = 0;
-					var calcScalePositionX = calcPositionX;
-					if (bigText == "true") {
-						scaleX = 1.5;
-						scaleY = 1.5;
-						scaleTime = 300;
-						newTimeCount = 600;
-						if (changeXPosition > 0) {
-							if ((($prevOrgPosXElem + $prevOrgWidth) > orPosX) && ($prevOrgPosXElem < orPosX)) {
-								changeXPosition = $prevOrgWidth - $prevOrgPosXElem + 30;
-							}
-							calcPositionX = calcPositionX + changeXPosition;
-						}
-					}
-					if (dragOut == "true") {
-						createjs.Tween.get(textDOM, {
-							loop: false
-						})
-							.wait(timeCount - newTimeCount).call(tweenStart)
-							.to({
-								scaleX: scaleX,
-								scaleY: scaleY,
-								x: changeXPosition
-							}, scaleTime)
-							.to({
-								x: calcPositionX + 300
-							}, 300, createjs.Ease.getPowIn(1))
-							.to({
-								y: calcPositionY
-							}, 900, createjs.Ease.getPowIn(1))
-							.to({
-								x: calcPositionX
-							}, 300, createjs.Ease.getPowIn(1))
-						.to({
-							scaleX: 1,
-							scaleY: 1,
-							x: calcScalePositionX
-						}, scaleTime)
-							.to({
-								alpha: 0
-							}, 0, createjs.Ease.getPowIn(1))
-							.to({
-								alpha: 1,
-								y: 0,
-								x: 0
-							}).call(tweenComplete);
-							getTextOrigin.show();
-						// call to function tweenComplete after animation is completed
-					}
-				}
-				// If there is more than one original-table
-				if (numberOfTables > 1) {
-					var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
-					var thisTableId = "#" + thisTableIdTemp;
-					var countOfDuplicates = $(thisTableId).find("span:not(#original-span)").filter(function() {
-    					return $(this).text() === textContent;
-					}).length;
-
-					// If there is duplicates of this element in this table
-					if ((countOfDuplicates > 1) && ($(".empty-table").find("tr").length <= $(thisTableId).find("tr").length)) {
-						/*if($(".original-table").find("span#animThis").parent().parent().find(".usedInRow").length > 0){
-							$(".original-table").find("span#animThis").removeAttr("id").parent().addClass("usedInRow").addClass("usedInRow_" + i);
-						}
-						else {*/
-						$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
-						//}
+					// If there is more than one original-table
+					if (numberOfTables > 1) {
+						// Get the right table for the element
+						var thisTableTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
+						var thisTable = "#" + thisTableTemp;
+						var orPosX = $(thisTable).find("span#animThis").position().left;
 					} else {
-						var duplicatesInAllTables = $(".original-table").find("span:not(.used)").filter(function() {
-    						return $(this).text() === textContent;
-						}).length;
-						// If there is duplicates of this element in both original-tables together
-						if (duplicatesInAllTables > countOfDuplicates) {
-							//This is a duplicate, mark as one
-							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
-							var thisRowCount = $(thisTable).find("tr#data").length;
-							var numOfReps = tableRows/thisRowCount;
+						var orPosX = $(".original-table").find("span#animThis").position().left;
+					}
+
+					// Calculated position Y from the original position and result position
+					var calcPositionY = emptyPosY - originalPosY;
+					// Calculated position X from the original position and result position
+					var calcPositionX = emptyPosX - orPosX;
+				
+					var thisDOMElem = $("#animThis").get(0);
+					var animThisIndex = $("#animThis:not(.used)").parent().index();
+					if ((animThisIndex > 0 && j > 0) && (((($allChangePositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)) || ((($prevCalcPositionX + $prevOrgPosXElem) + ($prevOrgWidth * 2)) >= (orgPosXElem + calcPositionX)))) {
+						var changeXPosition = $prevChangeXPosition + ($prevOrgWidth * 1.5) - $prevOrgWidth;
+					} else {
+						var changeXPosition = 0;
+					}
+					$prevCalcPositionX = calcPositionX;
+					$prevOrgPosXElem = orgPosXElem;
+					$prevChangeXPosition = changeXPosition;
+					$prevOrgWidth = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span:not(.textOrigin)").width();
+					$allChangePositionX =  $allChangePositionX + parseInt(changeXPosition);
+
+					//Create an DOMElement for the canvas
+					var textDOM = new createjs.DOMElement(thisDOMElem);
+					stage.addChild(textDOM);
+
+					animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition);
+
+					function animateTextFromDOM(bigText, dragOut, changeXPosition) {
+						var scaleX = 1;
+						var scaleY = 1;
+						var scaleTime = 0;
+						var newTimeCount = 0;
+						var calcScalePositionX = calcPositionX;
+						if (bigText == "true") {
+							scaleX = 1.5;
+							scaleY = 1.5;
+							scaleTime = 300;
+							newTimeCount = 600;
+							if (changeXPosition > 0) {
+								if ((($prevOrgPosXElem + $prevOrgWidth) > orPosX) && ($prevOrgPosXElem < orPosX)) {
+									changeXPosition = $prevOrgWidth - $prevOrgPosXElem + 30;
+								}
+								calcPositionX = calcPositionX + changeXPosition;
+							}
+						}
+						if (dragOut == "true") {
+							createjs.Tween.get(textDOM, {
+								loop: false
+							})
+								.wait(timeCount - newTimeCount).call(tweenStart)
+								.to({
+									scaleX: scaleX,
+									scaleY: scaleY,
+									x: changeXPosition
+								}, scaleTime)
+								.to({
+									x: calcPositionX + 300
+								}, 300, createjs.Ease.getPowIn(1))
+								.to({
+									y: calcPositionY
+								}, 900, createjs.Ease.getPowIn(1))
+								.to({
+									x: calcPositionX
+								}, 300, createjs.Ease.getPowIn(1))
+								.to({
+									scaleX: 1,
+									scaleY: 1,
+									x: calcScalePositionX
+								}, scaleTime)
+								.to({
+									alpha: 0
+								}, 0, createjs.Ease.getPowIn(1))
+								.to({
+									alpha: 1,
+									y: 0,
+									x: 0
+								}).call(tweenComplete);
+								getTextOrigin.show();
+								// call to function tweenComplete after animation is completed
+							}
+						}
+						// If there is more than one original-table
+						if (numberOfTables > 1) {
+							var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
+							var thisTableId = "#" + thisTableIdTemp;
+							var countOfDuplicates = $(thisTableId).find("span:not(#original-span):not(.textOrigin)").filter(function() {
+    							return $(this).text() === textContent;
+							}).length;
+							debugger;
+
+							// If there is duplicates of this element in this table
+							if ((countOfDuplicates > 1) && ($(".empty-table").find("tr").length <= $(thisTableId).find("tr").length)) {
+									$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+							} else {
+							var duplicatesInAllTables = $(".original-table").find("span:not(.used):not(.textOrigin)").filter(function() {
+    							return $(this).text() === textContent;
+							}).length;
+							// If there is duplicates of this element in both original-tables together
+							if (duplicatesInAllTables > countOfDuplicates) {
+								//This is a duplicate, mark as one
+								var thisText = $(".original-table").find("span#animThis").text();
+								var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
+								var thisRowCount = $(thisTable).find("tr#data").length;
+								var thisRowIndex = $(".original-table").find("span#animThis").parent().index();
+								var thisRowId = $(thisTable).find("th").eq(thisRowIndex).attr("id");
+								var thisRowContent = $(thisTable).find("th").eq(thisRowIndex).text();
+								var emptyRowIndex = $(".empty-table").find("th#"+thisRowId+":contains('"+thisRowContent+"')").index();
+								var emptyRowLength = $(".empty-table").find("td").find("span.span_"+emptyRowIndex).prev().filter(function() {
+    								return $(this).text() === thisText;
+								}).length;
+								var thisRowLength = $(thisTable).find("td").find("span.span_"+thisRowIndex).filter(function() {
+    								return $(this).text() === thisText;
+								}).length;
 							
-							if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
+								if($(".alert-info-decomposer").find("b:contains(RIGHT)").length > 0){
+									var numOfReps = emptyRowLength / thisRowLength;
+									if(thisText == "NULL" && tableRows/thisRowCount != numOfReps){
+										numOfReps = 1;
+									}
+								}
+								else {
+									var numOfReps = tableRows/thisRowCount;
+									if(numOfReps%1 > 0.5){
+										numOfReps = numOfReps + 1 - (numOfReps%1);
+									}
+									else {
+										numOfReps = numOfReps - (numOfReps%1);
+									}
+								}
+								
+								if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross")) || ($(".alert-info-decomposer").find("b:contains(RIGHT)").length > 0)) {
+									//If Cartesian product
+									if(typeof $(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value") === 'undefined'){
+										$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", "0")
+									}
+									var numUsed = parseInt($(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value"));
+									if(numUsed < numOfReps){
+										if(duplicatesInAllTables - countOfDuplicates > countOfDuplicates){
+											$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
+										}
+										numUsed = numUsed+1;
+										$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", numUsed);
+										if(numUsed == numOfReps){
+											$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
+										}
+									}
+									else {
+										$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
+									}
+								}
+								else {
+									$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
+								}
+							}//($(".alert-info-decomposer").find("b:contains(ON)").length != 0) && 
+							else if ((($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))|| ($(".alert-info-decomposer").find("b:contains(RIGHT)").length > 0)) {
 								//If Cartesian product
+								var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
+								var thisText = $(".original-table").find("span#animThis").text();
+								var thisRowCount = $(thisTable).find("tr#data").length;
+								var thisRowIndex = $(".original-table").find("span#animThis").parent().index();
+								var thisRowId = $(thisTable).find("th").eq(thisRowIndex).attr("id");
+								var thisRowContent = $(thisTable).find("th").eq(thisRowIndex).text();
+								var emptyRowIndex = $(".empty-table").find("th#"+thisRowId+":contains('"+thisRowContent+"')").index();
+								var emptyRowLength = $(".empty-table").find("td").find("span.span_"+emptyRowIndex).prev().filter(function() {
+    								return $(this).text() === thisText;
+								}).length;
+								var thisRowLength = $(thisTable).find("td").find("span.span_"+thisRowIndex).filter(function() {
+    								return $(this).text() === thisText;
+								}).length;
+							
+								//if($(".alert-info-decomposer").find("b:contains(RIGHT)").length > 0){
+									var numOfReps = emptyRowLength / thisRowLength;
+									if(thisText == "NULL" && tableRows/thisRowCount != numOfReps){
+										numOfReps = 1;
+									}
+									//}
+								/*else {
+									var numOfReps = tableRows/thisRowCount;
+									if(numOfReps%1 > 0.5){
+										numOfReps = numOfReps + 1 - (numOfReps%1);
+									}
+									else {
+										numOfReps = numOfReps - (numOfReps%1);
+									}
+								}*/
+								
 								if(typeof $(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value") === 'undefined'){
 									$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", "0")
 								}
 								var numUsed = parseInt($(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value"));
 								if(numUsed < numOfReps){
-									if(duplicatesInAllTables - countOfDuplicates > countOfDuplicates){
-										$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
-									}
 									numUsed = numUsed+1;
 									$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", numUsed);
 									if(numUsed == numOfReps){
@@ -425,36 +501,27 @@ function init() {
 									$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
 								}
 							}
-							else {
-								$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("duplicate");
-							}
+							// remove id animThis from element
+							$(".original-table").find("span#animThis").first().removeAttr("id").parent().find(".textOrigin").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 						}
-						else if ((($(".alert-info-decomposer").find("b:contains(ON)").length == 0) && ($(".alert-info-decomposer").find("b:contains(JOIN)").length > 0)) || ($(thisTable).hasClass("cross"))) {
-							//If Cartesian product
-							var thisTable = $(".original-table").find("span#animThis").first().parent().parent().parent().parent();
-							var thisRowCount = $(thisTable).find("tr#data").length;
-							var numOfReps = tableRows/thisRowCount;
-							if(typeof $(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value") === 'undefined'){
-								$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", "0")
-							}
-							var numUsed = parseInt($(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value"));
-							if(numUsed < numOfReps){
-								numUsed = numUsed+1;
-								$(".original-table").find("span#animThis").parent().find(".textOrigin").attr("value", numUsed);
-								if(numUsed == numOfReps){
-									$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
-								}
-							}
-							else {
-								$(".original-table").find("span#animThis").parent().find(".textOrigin").addClass("used");
-							}
-						}
-						// remove id animThis from element
-						$(".original-table").find("span#animThis").first().removeAttr("id").parent().find(".textOrigin").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+					} else {
+						// Element is used and used in row
+						$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
 					}
-				} else {
-					// Element is used and used in row
-					$(".original-table").find("span#animThis").removeAttr("id").parent().find(".textOrigin").addClass("used").parent().addClass("usedInRow").addClass("usedInRow_" + i);
+				}
+				else {
+					var altDOMElem = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span").get(0);
+					var altDOM = new createjs.DOMElement(altDOMElem);
+					stage.addChild(altDOM);
+					
+					createjs.Tween.get(altDOM, {
+						loop: false
+					})
+					.wait(timeCount - 600 + 2000).call(alternateTweenComplete);
+					function alternateTweenComplete(){
+						var emptyTextPlace = $("#empty-table").find("tr:nth-child(" + rowCount + ")").find("td:nth-child(" + columnCount + ")").find("span");
+						emptyTextPlace.css("visibility", "visible"); //Check quick away and back
+					}
 				}
 
 				/**

@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 			<title>viSQLizer</title>
 			
@@ -29,6 +29,7 @@
 			if($_POST){
 				$sql = $_POST["sql-input"];
 				$sql = str_replace('"',"'",$sql);
+				$sql = str_replace(' 0'," '0'",$sql);
 			}
 			
 			ini_set('display_errors',1);

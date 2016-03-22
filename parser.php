@@ -279,6 +279,7 @@
 		 */
 		private function highlightText($textArray1,$textArray2) {
 			$keys=array();
+			$textArray2 = array_filter(array_merge(array(0), $textArray2));
 			$textArray1=cleanArray($textArray1);
 			//$textArray2=$textArray1;
 			if (!$textArray2==null) {
@@ -339,7 +340,6 @@
 		}
 		// Displays the text and tabled for the step inside a wizard
 		public function showStep2($step, $sql) {
-			
 			$tableName[] = $this->getListOfTables();
 			$numOfSteps = $this->getTotalSteps();
 			$thisStep = $step;
@@ -382,7 +382,7 @@
 			}
 			if((empty($this->parser->parsed['SELECT'][0]['alias'])) && ($this->parser->parsed['SELECT'][0]['expr_type']!="aggregate_function") && ($this->parser->parsed['FROM'][0]['alias']['name']!="NATURAL")) {
 				echo "<div class='panel panel-default streammode-panel' id='main-panel streammode-panel'><div class='panel-heading'><h3 class='panel-title'> Step " . $thisStep . " of " . $thisNumStep . "</h3></div>";
-				//print_r($this->singleStepTable[3]);
+				//print_r($this->singleStepTable[$step]);
 				echo "<div class='panel-body'>";
 				
 				foreach($this->singleStepTable[$step] as $output) {
