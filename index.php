@@ -58,16 +58,20 @@
 				<form method="post">
 					<div class="btn-toolbar sql-op-btn-toolbar" role="toolbar" aria-label="...">
 					  <div class="btn-group sql-op-btn-group" role="group" aria-label="...">
-  				 	   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' SELECT ');">SELECT</button>
-					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' FROM ');">FROM</button>
-					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' WHERE ');">WHERE</button>
+  				 	   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' SELECT '); var input = $('#sql-query-input');
+input[0].selectionStart = input[0].selectionEnd = input.val().length;">SELECT</button>
+					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' FROM '); var input = $('#sql-query-input');
+input[0].selectionStart = input[0].selectionEnd = input.val().length;">FROM</button>
+					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' WHERE '); var input = $('#sql-query-input');
+input[0].selectionStart = input[0].selectionEnd = input.val().length;">WHERE</button>
 					  </div>
 					  <div class="btn-group sql-op-btn-group" role="group" aria-label="...">
-  				 	   <button type="button" class="btn btn-danger" onclick="$('#sql-query-input').val('');">Erase</button>
+  				 	   <button type="button" class="btn btn-danger" onclick="$('#sql-query-input').val(''); var input = $('#sql-query-input');
+input[0].selectionStart = input[0].selectionEnd = input.val().length;">Erase</button>
 					  </div>
 		   			</div>
 					<div class="input-group">
-						<input type="text" id="sql-query-input" class="form-control" placeholder="Enter a SQL query.."
+						<input type="text" id="sql-query-input" class="form-control" autocomplete="off" placeholder="Enter a SQL query.."
 							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">
 							<span class="input-group-btn">
 								<button class="btn btn-default decompose" type="submit">Run new query!</button>
