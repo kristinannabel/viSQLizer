@@ -54,8 +54,18 @@
 				  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 				  <strong>Oh no!</strong> The query allready excists in the database
 				</div>
-			
+				
 				<form method="post">
+					<div class="btn-toolbar sql-op-btn-toolbar" role="toolbar" aria-label="...">
+					  <div class="btn-group sql-op-btn-group" role="group" aria-label="...">
+  				 	   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' SELECT ');">SELECT</button>
+					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' FROM ');">FROM</button>
+					   <button type="button" class="btn btn-blue" onclick="$('#sql-query-input').val($('#sql-query-input').val() + ' WHERE ');">WHERE</button>
+					  </div>
+					  <div class="btn-group sql-op-btn-group" role="group" aria-label="...">
+  				 	   <button type="button" class="btn btn-danger" onclick="$('#sql-query-input').val('');">Erase</button>
+					  </div>
+		   			</div>
 					<div class="input-group">
 						<input type="text" id="sql-query-input" class="form-control" placeholder="Enter a SQL query.."
 							<? if(isset($sql)){ echo "value=\"" .$sql. "\"";}?>	name="sql-input">

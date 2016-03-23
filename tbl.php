@@ -342,7 +342,7 @@ class tbl{
 													}
 												}
 											}
-											echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] . print_r($whereColumns[1]) .'</p></th>';
+											echo '<th class="'. $whereClassName . ' ' . $GroupByClassName . ' ' . $OrderByClassName . ' ' . $onClassName . ' '. $keys[$i] . '" id="' . $finfo->orgtable . '"><p>' . $keys[$i] .'</p></th>';
 										}
 									} 
 								}unset($keys);

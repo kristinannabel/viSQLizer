@@ -75,3 +75,15 @@ div[id="main-panel streammode-panel"].panel.panel-default.streammode-panel {
 }
 .extraSpan {
 }
+.sql-op-btn-toolbar {
+	margin-bottom: 10px;
+}
+.btn-blue {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #a1c7ce;
+}
+.btn-blue:hover {
+	color: #31708f;
+	background-color: #cbdde7;
+}
