@@ -4,7 +4,7 @@ $( document ).ready(function() {
 	localStorage['dragout'] = true;
 	localStorage['bigtext'] = true;
 	$markRowisShown = false;
-		
+	
 	/* For when user hovers one of the cells in the empty-table */
 	$("#empty-table td").live('mouseover', function(e){
 		e.stopPropagation();

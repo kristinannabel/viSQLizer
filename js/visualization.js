@@ -97,7 +97,6 @@ function checkIfDuplicatedData(textContent, duplData, thisGetTextOrigin, rowCoun
 		// If this is not the first column in both tables
 		isNotFirstColumn = true;
 	}
-	debugger;
 	if ((($(".alert-info-decomposer").find("b:contains(ORDER )").length > 0) || ($(".alert-info-decomposer").find("b:contains(GROUP )").length > 0) || ($(".original-table").hasClass("crossed"))) && (thisGetTextOrigin.length > 1)) {
 		var numberOfColumns = $("#empty-table").find("tr.data:first").find("td").length;
 		var countNumOfEquals = 0;
@@ -325,8 +324,6 @@ function init() {
 					var textDOM = new createjs.DOMElement(thisDOMElem);
 					stage.addChild(textDOM);
 
-					animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition);
-
 					function animateTextFromDOM(bigText, dragOut, changeXPosition) {
 						var scaleX = 1;
 						var scaleY = 1;
@@ -379,8 +376,12 @@ function init() {
 								}).call(tweenComplete);
 								getTextOrigin.show();
 								// call to function tweenComplete after animation is completed
-							}
 						}
+					}
+
+					animateTextFromDOM(localStorage['bigtext'], localStorage['dragout'], changeXPosition);
+
+					
 						// If there is more than one original-table
 						if (numberOfTables > 1) {
 							var thisTableIdTemp = $(".original-table").find("span#animThis").parent().parent().parent().parent().attr("id");
@@ -388,7 +389,6 @@ function init() {
 							var countOfDuplicates = $(thisTableId).find("span:not(#original-span):not(.textOrigin)").filter(function() {
     							return $(this).text() === textContent;
 							}).length;
-							debugger;
 
 							// If there is duplicates of this element in this table
 							if ((countOfDuplicates > 1) && ($(".empty-table").find("tr").length <= $(thisTableId).find("tr").length)) {

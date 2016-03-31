@@ -2,7 +2,7 @@
 
 class tbl{
 		
-	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array(), $isMultipleJoin=false, $thisStep=1, $numericArrayResult=array()) {
+	function make_table($result, $show_headings, $tablename="", $empty=false, $step=1, $tableName=array(), $whereColumns=array(), $onColumns=array(), $onOrderBy=array(), $onGroupBy=array(), $previousTable=array(), $sql="", $joinType=array(), $isMultipleJoin=false, $thisStep=1) {
 		if(!empty($previousTable) && $step > 1){
 			foreach($previousTable[$step-1] as $output) {
 				if ($output['type']=='table') {
@@ -599,9 +599,6 @@ class tbl{
 			
 				<?php
 					$keys = array_keys($result[0]);
-					for($r = 0; $r < count($numericArrayResult); $r++){
-						$numericKeys = array_keys($numericArrayResult[$r]);
-					}// FIX later!! this is only for last step. Make it for every step, and check against result. Should have equal amount of columns. If not, get them
 					$var = (string)$previousTable[$step][1]['contents'];
 					$removeWords = array("returned", "the", "following", "table:", "<b>", "</b>", "<i>", "</i>");
 					$tempString = str_replace($removeWords, "", $var);
@@ -610,7 +607,49 @@ class tbl{
 					mysqli_report(MYSQLI_REPORT_ERROR);
 					$con=mysqli_connect(DB_SERVER,DECOMPOSE_USER,DECOMPOSE_PASSWORD,DECOMPOSE_DATABASE);
 					$tempResult = mysqli_query($con, $tempQuery);
+					$numericResult = mysqli_query($con, $tempString);
 					mysqli_close($con);
+					$numericArrayResult = mysqli_fetch_row($numericResult);
+					
+					if(count($result[0]) / 2 != count($numericArrayResult)){
+						// Table headings:
+						if($show_headings){
+							for($i=1, $c=0; $i <= count($numericArrayResult); $i++, $c++) {
+								$finfo = mysqli_fetch_field_direct($tempResult, $c);
+								echo '<th class="' . $finfo->name . '" id="' . $finfo->orgtable . '"><p>' . $finfo->name . '</p></th>';	
+							} 
+						}
+						unset($keys);
+						//unset($finfo);
+						mysqli_free_result($tempResult);
+						//mysqli_close($con);
+						?>
+				</tr>
+						<?php
+						// Table data:
+						for($i=0; $i < count($result); $i++){ 
+							$thisRow = $i+1; 
+							echo '<tr class="data" id="row_'.$thisRow.'">';
+							if($i > 0){
+								$numericArrayResult = mysqli_fetch_row($numericResult);
+							}
+							for($j=0; $j<count($numericArrayResult); $j++) {
+								if($numericArrayResult[$j] == ""){
+									$numericArrayResult[$j] = "NULL";
+								}
+								if($j == 0){
+									echo '<td><span class="textOrigin"  >' . utf8_encode($numericArrayResult[$j]) . '</span><span class="span_'.$j.'"  >' . utf8_encode($numericArrayResult[$j]) . '</span> <span class="glyphicon glyphicon-arrow-right" style="display: none;"></span></td>';
+								}
+								else {
+									echo '<td><span class="textOrigin"  >' . utf8_encode($numericArrayResult[$j]) . '</span><span class="span_'.$j.'"  >' . utf8_encode($numericArrayResult[$j]) . '</span></td>';
+								}
+							} ?>
+							</tr>
+							<?php
+						}
+					}
+					else {
+					
 					// Table headings:
 					if($show_headings){
 						for($i=1, $c=0; $i <= count($keys); $i+= 2, $c++) {
@@ -655,7 +694,8 @@ class tbl{
 							}?>
 						</tr>
 						<?php
-					} ?>
+					} 
+				} ?>
 			</tbody>
 			</table>
 		<?php }	
